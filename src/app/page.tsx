@@ -5,7 +5,7 @@ export default function Home() {
   const whatsapp = `https://wa.me/${phone}`;
 
   return (
-    <main className="min-h-screen bg-primary-50 text-neutral-50 relative overflow-hidden">
+    <main className="bg-primary-50 text-neutral-50 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="fixed inset-0 gradient-radial opacity-50 pointer-events-none" />
       
@@ -53,7 +53,7 @@ export default function Home() {
               href={whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-neon-green text-primary-50 px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-neon-green/50"
+              className="bg-neon-green text-primary-50 px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-[0_0_20px_#39FF14]"
             >
               Comprar Ahora
             </a>
@@ -69,16 +69,21 @@ export default function Home() {
 
         {/* PRODUCT VISUAL */}
         <div className="relative z-10">
-          <div className="bg-primary-100 rounded-[3rem] p-12 border border-primary-100 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/10 to-neon-blue/10" />
-            <div className="relative h-80 rounded-[2rem] flex items-center justify-center border border-neon-blue/30">
-              {/* Earplug Mock */}
+          <div className="relative overflow-hidden rounded-[3rem]">
+            <img 
+              src="/images/earplugsafesound.png" 
+              alt="Background" 
+              className="w-full h-full object-cover opacity-90"
+            />
+            
+            {/* Small logo in top-right corner with dynamic effects */}
+            <div className="absolute top-4 right-4">
               <div className="relative animate-float">
-                <div className="w-32 h-16 rounded-full border-4 border-neon-green flex items-center justify-end px-4 shadow-lg shadow-neon-green/30">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neon-green to-neon-blue shadow-xl shadow-neon-green/50" />
+                <div className="w-12 h-6 rounded-full border-2 border-neon-green flex items-center justify-end px-2 shadow-lg shadow-neon-green/30">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-green to-neon-blue shadow-xl shadow-neon-green/50" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-neon-purple animate-pulse" />
-                <div className="absolute -bottom-2 -left-2 w-3 h-3 rounded-full bg-neon-blue animate-pulse delay-75" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-neon-purple animate-pulse" />
+                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-neon-blue animate-pulse delay-75" />
               </div>
             </div>
           </div>
