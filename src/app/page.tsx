@@ -79,11 +79,11 @@ export default function Home() {
             {/* Small logo in top-right corner with dynamic effects */}
             <div className="absolute top-4 right-4">
               <div className="relative animate-float">
-                <div className="w-12 h-6 rounded-full border-2 border-minimal-beige flex items-center justify-end px-2 shadow-lg shadow-minimal-beige/30">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-minimal-beige to-minimal-sand shadow-xl shadow-minimal-beige/50" />
+                <div className="w-12 h-6 rounded-full border-2 border-[#39FF14] flex items-center justify-end px-2 shadow-lg shadow-green-500/30">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#39FF14] to-[#00E5FF] shadow-xl shadow-green-500/50" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-minimal-brown animate-pulse" />
-                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-minimal-sand animate-pulse delay-75" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#A100FF] animate-pulse" />
+                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse delay-75" />
               </div>
             </div>
           </div>
