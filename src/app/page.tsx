@@ -23,7 +23,7 @@ export default function Home() {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-minimal-beige text-primary-50 px-6 py-2 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-minimal-beige/50"
+            className="bg-[#25D366] text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/50"
           >
             WhatsApp
           </a>
@@ -53,7 +53,7 @@ export default function Home() {
               href={whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-minimal-beige text-primary-50 px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-[0_0_20px_#D4C4B0]"
+              className="bg-[#25D366] text-white px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-[0_0_20px_#25D366]"
             >
               Comprar Ahora
             </a>
@@ -209,7 +209,7 @@ export default function Home() {
               href={whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-primary-50 text-minimal-beige px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-minimal-beige/50"
+              className="inline-block bg-white text-[#25D366] px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/50"
             >
               Comprar Ahora
             </a>
@@ -235,7 +235,7 @@ export default function Home() {
         href={whatsapp}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-8 right-8 bg-minimal-beige text-primary-50 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-2xl hover:scale-110 transition-all duration-300 animate-glow z-50"
+        className="fixed bottom-8 right-8 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-2xl hover:scale-110 transition-all duration-300 animate-glow z-50"
       >
         W
       </a>
