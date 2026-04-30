@@ -13,10 +13,11 @@ const config: Config = {
           50: "#050505",
           100: "#1A1A1A",
         },
-        neon: {
-          green: "#39FF14",
-          purple: "#A100FF",
-          blue: "#00E5FF",
+        minimal: {
+          beige: "#D4C4B0",
+          brown: "#8B7355",
+          sand: "#C9B8A5",
+          cream: "#F5F0E8",
         },
         neutral: {
           50: "#F5F5F5",
@@ -29,8 +30,8 @@ const config: Config = {
       },
       keyframes: {
         glow: {
-          '0%': { boxShadow: '0 0 20px rgba(57, 255, 20, 0.5)' },
-          '100%': { boxShadow: '0 0 30px rgba(57, 255, 20, 0.8)' },
+          '0%': { boxShadow: '0 0 20px rgba(212, 196, 176, 0.5)' },
+          '100%': { boxShadow: '0 0 30px rgba(212, 196, 176, 0.8)' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },

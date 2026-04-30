@@ -14,7 +14,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex flex-col">
             <h1 className="text-2xl font-black tracking-tight">
-              SAFE<span className="text-neon-green">SOUND</span>
+              SAFE<span className="text-minimal-beige">SOUND</span>
             </h1>
             <p className="text-xs text-neutral-100 tracking-widest uppercase">MUTE THE NOISE</p>
           </div>
@@ -23,7 +23,7 @@ export default function Home() {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-neon-green text-primary-50 px-6 py-2 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-neon-green/50"
+            className="bg-minimal-beige text-primary-50 px-6 py-2 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-minimal-beige/50"
           >
             WhatsApp
           </a>
@@ -33,14 +33,14 @@ export default function Home() {
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center relative">
         <div className="z-10">
-          <p className="text-neon-blue uppercase tracking-[0.3em] text-sm font-medium">
+          <p className="text-minimal-sand uppercase tracking-[0.3em] text-sm font-medium">
             Protección auditiva premium
           </p>
 
           <h2 className="text-6xl md:text-7xl font-black mt-6 leading-[0.95]">
             Silencia el ruido.
             <br />
-            <span className="text-neon-green neon-text">Vive mejor.</span>
+            <span className="text-minimal-beige">Vive mejor.</span>
           </h2>
 
           <p className="mt-6 text-neutral-100 text-xl max-w-xl leading-relaxed">
@@ -53,14 +53,14 @@ export default function Home() {
               href={whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-neon-green text-primary-50 px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-[0_0_20px_#39FF14]"
+              className="bg-minimal-beige text-primary-50 px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-[0_0_20px_#D4C4B0]"
             >
               Comprar Ahora
             </a>
 
             <a
               href="#beneficios"
-              className="border border-neon-blue text-neon-blue px-8 py-4 rounded-full hover:bg-neon-blue hover:text-primary-50 transition-all duration-300"
+              className="border border-minimal-sand text-minimal-sand px-8 py-4 rounded-full hover:bg-minimal-sand hover:text-primary-50 transition-all duration-300"
             >
               Ver Más
             </a>
@@ -79,11 +79,11 @@ export default function Home() {
             {/* Small logo in top-right corner with dynamic effects */}
             <div className="absolute top-4 right-4">
               <div className="relative animate-float">
-                <div className="w-12 h-6 rounded-full border-2 border-neon-green flex items-center justify-end px-2 shadow-lg shadow-neon-green/30">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-green to-neon-blue shadow-xl shadow-neon-green/50" />
+                <div className="w-12 h-6 rounded-full border-2 border-minimal-beige flex items-center justify-end px-2 shadow-lg shadow-minimal-beige/30">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-minimal-beige to-minimal-sand shadow-xl shadow-minimal-beige/50" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-neon-purple animate-pulse" />
-                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-neon-blue animate-pulse delay-75" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-minimal-brown animate-pulse" />
+                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-minimal-sand animate-pulse delay-75" />
               </div>
             </div>
           </div>
@@ -114,10 +114,10 @@ export default function Home() {
         ].map((item, i) => (
           <div
             key={i}
-            className="bg-primary-100 p-8 rounded-3xl border border-primary-100 hover:border-neon-blue/50 transition-all duration-300 group"
+            className="bg-primary-100 p-8 rounded-3xl border border-primary-100 hover:border-minimal-sand/50 transition-all duration-300 group"
           >
             <div className="text-4xl mb-4">{item.icon}</div>
-            <h3 className="text-2xl font-bold text-neon-green mb-4">{item.title}</h3>
+            <h3 className="text-2xl font-bold text-minimal-beige mb-4">{item.title}</h3>
             <p className="text-neutral-100 leading-relaxed">{item.description}</p>
           </div>
         ))}
@@ -126,22 +126,22 @@ export default function Home() {
       {/* WHY SAFESOUND */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="rounded-[3rem] bg-primary-100 border border-primary-100 p-12 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/5 to-neon-blue/5" />
+          <div className="absolute inset-0 bg-gradient-to-r from-minimal-brown/5 to-minimal-sand/5" />
           <div className="relative z-10">
             <h3 className="text-5xl font-black mb-6">
-              ¿Por qué <span className="text-neon-green">SafeSound</span>?
+              ¿Por qué <span className="text-minimal-beige">SafeSound</span>?
             </h3>
 
             <div className="grid md:grid-cols-2 gap-8 mt-12">
               <div>
-                <h4 className="text-2xl font-bold text-neon-blue mb-4">No es médico, es lifestyle</h4>
+                <h4 className="text-2xl font-bold text-minimal-sand mb-4">No es médico, es lifestyle</h4>
                 <p className="text-neutral-100 text-lg leading-relaxed">
                   Somos una solución moderna para el ruido diario. Pensado para personas activas que valoran 
                   diseño, comodidad y protección en su día a día.
                 </p>
               </div>
               <div>
-                <h4 className="text-2xl font-bold text-neon-purple mb-4">Diseño que te representa</h4>
+                <h4 className="text-2xl font-bold text-minimal-brown mb-4">Diseño que te representa</h4>
                 <p className="text-neutral-100 text-lg leading-relaxed">
                   Estilo minimalista, tecnología avanzada y comodidad premium. Porque tu protección 
                   auditiva debe ser tan cool como tú.
@@ -155,7 +155,7 @@ export default function Home() {
       {/* REVIEWS */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h3 className="text-4xl font-black text-center mb-16">
-          Lo que dicen <span className="text-neon-green">nuestros clientes</span>
+          Lo que dicen <span className="text-minimal-beige">nuestros clientes</span>
         </h3>
         
         <div className="grid md:grid-cols-3 gap-8">
@@ -182,13 +182,13 @@ export default function Home() {
             <div key={i} className="bg-primary-100 p-8 rounded-3xl border border-primary-100">
               <div className="flex mb-4">
                 {[...Array(review.rating)].map((_, j) => (
-                  <span key={j} className="text-neon-green text-xl">★</span>
+                  <span key={j} className="text-minimal-beige text-xl">★</span>
                 ))}
               </div>
               <p className="text-neutral-100 mb-6 italic">"{review.text}"</p>
               <div>
                 <p className="font-bold text-neutral-50">{review.name}</p>
-                <p className="text-neon-blue text-sm">{review.role}</p>
+                <p className="text-minimal-sand text-sm">{review.role}</p>
               </div>
             </div>
           ))}
@@ -197,7 +197,7 @@ export default function Home() {
 
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <div className="rounded-[3rem] p-16 bg-gradient-to-r from-neon-green via-neon-purple to-neon-blue text-primary-50 text-center relative overflow-hidden">
+        <div className="rounded-[3rem] p-16 bg-gradient-to-r from-minimal-beige via-minimal-brown to-minimal-sand text-primary-50 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-black/20" />
           <div className="relative z-10">
             <h3 className="text-5xl font-black mb-6">Protege tus oídos hoy</h3>
@@ -209,7 +209,7 @@ export default function Home() {
               href={whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-primary-50 text-neon-green px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-neon-green/50"
+              className="inline-block bg-primary-50 text-minimal-beige px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-minimal-beige/50"
             >
               Comprar Ahora
             </a>
@@ -221,7 +221,7 @@ export default function Home() {
       <footer className="text-center py-12 text-neutral-100 border-t border-primary-100">
         <div className="max-w-7xl mx-auto px-6">
           <h4 className="text-2xl font-black mb-4">
-            SAFE<span className="text-neon-green">SOUND</span>
+            SAFE<span className="text-minimal-beige">SOUND</span>
           </h4>
           <p className="text-sm mb-4">© 2026 SafeSound • Mute the Noise</p>
           <p className="text-xs text-neutral-100">
@@ -235,7 +235,7 @@ export default function Home() {
         href={whatsapp}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-8 right-8 bg-neon-green text-primary-50 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-2xl hover:scale-110 transition-all duration-300 animate-glow z-50"
+        className="fixed bottom-8 right-8 bg-minimal-beige text-primary-50 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-2xl hover:scale-110 transition-all duration-300 animate-glow z-50"
       >
         W
       </a>
