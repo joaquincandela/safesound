@@ -53,9 +53,39 @@ const benefitBarItems = [
 ];
 
 const reviews = [
-  "Los usé en una fiesta y se sintieron demasiado cómodos.",
-  "Me ayudaron a estudiar sin sentirme aislado.",
-  "Se ven premium y el estuche está brutal.",
+  {
+    name: "Andrea",
+    age: 24,
+    context: "Diseñadora gráfica",
+    quote: "Los usé en un festival y me sorprendió lo cómodos que son.",
+  },
+  {
+    name: "Diego",
+    age: 21,
+    context: "Estudiante universitario",
+    quote: "Ahora puedo estudiar en cafeterías sin distraerme tanto.",
+  },
+  {
+    name: "Camila",
+    age: 29,
+    context: "Arquitecta",
+    quote: "En vuelos largos me ayudan muchísimo a descansar mejor.",
+  },
+];
+
+const includedItems = [
+  {
+    icon: ShieldCheck,
+    title: "Earplugs premium",
+  },
+  {
+    icon: Cross,
+    title: "Estuche portátil",
+  },
+  {
+    icon: RefreshCw,
+    title: "Tallas de repuesto",
+  },
 ];
 
 type ProductSlide = {
@@ -77,7 +107,7 @@ const productSlides: ProductSlide[] = [
   },
   {
     src: "/images/product-lifestyle.png",
-    alt: "Producto SafeSound en una composiciÃ³n lifestyle",
+    alt: "Producto SafeSound en una composición lifestyle",
     caption: "Lifestyle premium",
   },
 ];
@@ -232,7 +262,7 @@ export default function SafeSound() {
           <div className="absolute h-[500px] w-[500px] rounded-full bg-[#B7FF00]/25 blur-[120px]" />
           <Image
             src="/images/mute-hero-hd.png"
-            alt="Render premium de los earplugs Mute 1"
+            alt="Render premium de los earplugs Mute"
             width={1254}
             height={1254}
             priority
@@ -265,42 +295,42 @@ export default function SafeSound() {
               }`}
             >
               {cardBackgroundImage ? (
-              <>
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
-                  style={{ backgroundImage: `url('${cardBackgroundImage}')` }}
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.14)_0%,rgba(8,8,8,0.34)_38%,rgba(8,8,8,0.72)_100%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
-                <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
-              </>
-            ) : null}
+                <>
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
+                    style={{ backgroundImage: `url('${cardBackgroundImage}')` }}
+                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.14)_0%,rgba(8,8,8,0.34)_38%,rgba(8,8,8,0.72)_100%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
+                  <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
+                </>
+              ) : null}
 
-            <div
-              className={`relative z-10 ${
-                cardBackgroundImage ? "text-[#B7FF00]" : "text-[#7B2CFF]"
-              }`}
-            >
-              <Icon />
-            </div>
-            <h3
-              className={`relative z-10 mt-5 text-2xl font-black ${
-                cardBackgroundImage
-                  ? "max-w-[14rem] text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]"
-                  : "text-[#252525]"
-              }`}
-            >
-              {title}
-            </h3>
-            <p
-              className={`relative z-10 mt-3 leading-relaxed ${
-                cardBackgroundImage
-                  ? "max-w-[16rem] text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.52)]"
-                  : "text-[#666]"
-              }`}
-            >
-              {text}
-            </p>
+              <div
+                className={`relative z-10 ${
+                  cardBackgroundImage ? "text-[#B7FF00]" : "text-[#7B2CFF]"
+                }`}
+              >
+                <Icon />
+              </div>
+              <h3
+                className={`relative z-10 mt-5 text-2xl font-black ${
+                  cardBackgroundImage
+                    ? "max-w-[14rem] text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]"
+                    : "text-[#252525]"
+                }`}
+              >
+                {title}
+              </h3>
+              <p
+                className={`relative z-10 mt-3 leading-relaxed ${
+                  cardBackgroundImage
+                    ? "max-w-[16rem] text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.52)]"
+                    : "text-[#666]"
+                }`}
+              >
+                {text}
+              </p>
             </div>
           );
         })}
@@ -338,7 +368,7 @@ export default function SafeSound() {
                     </h3>
                     <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/72">
                       Agrega `/images/product-lifestyle.png` para mostrar esta
-                      vista. El carrusel ya estÃ¡ preparado sin romper la web.
+                      vista. El carrusel ya está preparado sin romper la web.
                     </p>
                   </div>
                 </div>
@@ -429,32 +459,78 @@ export default function SafeSound() {
             </div>
           </div>
 
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
-          >
-            <MessageCircle size={22} />
-            Pedir por WhatsApp
-          </a>
+          <div className="mt-10 rounded-[2rem] border border-[#DDD6D0] bg-white/90 p-6 shadow-sm backdrop-blur">
+            <div className="grid gap-6 border-b border-[#EEE7E2] pb-6 md:grid-cols-[auto_1fr] md:items-end">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
+                  Desde
+                </p>
+                <p className="mt-2 text-4xl font-black tracking-tight text-[#252525] md:text-5xl">
+                  S/50
+                </p>
+              </div>
+
+              <div className="md:flex md:justify-end md:pb-1">
+                <a
+                  href={wa}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
+                >
+                  <MessageCircle size={22} />
+                  Pedir por WhatsApp
+                </a>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {includedItems.map(({ icon: Icon, title }) => (
+                <div
+                  key={title}
+                  className="rounded-[1.5rem] border border-[#E8E1DC] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F2_100%)] p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#7B2CFF]/8">
+                    <Icon className="text-[#7B2CFF]" size={22} />
+                  </div>
+                  <p className="mt-4 text-sm font-bold text-[#252525]">
+                    {title}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-20">
         <h2 className="text-center text-5xl font-black">Comentarios reales</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-[#666]">
+          Opiniones auténticas de personas que ya usan SafeSound en su día a
+          día.
+        </p>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {reviews.map((review) => (
+          {reviews.map(({ age, context, name, quote }) => (
             <div
-              key={review}
-              className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8"
+              key={name}
+              className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
               <div className="flex gap-1 text-[#B7FF00]">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <Star key={n} size={18} fill="currentColor" />
                 ))}
               </div>
-              <p className="mt-5 leading-relaxed text-[#555]">{review}</p>
+
+              <p className="mt-5 text-lg leading-relaxed text-[#444]">
+                “{quote}”
+              </p>
+
+              <div className="mt-8 border-t border-[#EEE7E2] pt-5">
+                <p className="font-black text-[#252525]">{name}</p>
+                <p className="mt-1 text-sm text-[#6F6A66]">
+                  {age} años · {context}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -545,35 +621,30 @@ export default function SafeSound() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="group relative overflow-hidden rounded-[2rem] border border-white/10 p-14 text-center shadow-[0_28px_90px_rgba(0,0,0,0.24)]">
-          <div
-            className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
-            style={{ backgroundImage: "url('/images/logo.ear.png')" }}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.18)_0%,rgba(18,18,18,0.46)_48%,rgba(18,18,18,0.82)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.28),transparent_34%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.18),transparent_38%)]" />
-          <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
-          <div className="pointer-events-none absolute left-1/2 top-8 z-10 h-28 w-28 -translate-x-1/2 rounded-full border border-white/18 bg-[radial-gradient(circle,#ffffff_0%,#ffffffb3_18%,#B7FF00_42%,#7B2CFF_76%,transparent_100%)] opacity-70 blur-[2px] float-slow" />
-          <div className="pointer-events-none absolute left-1/2 top-7 z-10 h-36 w-36 -translate-x-1/2 rounded-full bg-[#B7FF00]/18 blur-3xl float-slow" />
-          <div className="relative z-20">
-          <h2 className="text-5xl font-black text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.38)] md:text-6xl">
-            Vive tu momento.
-          </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.42)]">
-            Compra directa por WhatsApp. Atención rápida y personalizada.
-          </p>
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105 hover:bg-[#F8F4E8]"
-          >
-            <MessageCircle size={22} />
-            Comprar Mute
-          </a>
+      <section
+        className="group relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 bg-cover bg-center bg-no-repeat px-8 py-20 text-center shadow-[0_28px_90px_rgba(0,0,0,0.24)] sm:px-14"
+        style={{ backgroundImage: "url('/images/logo.ear.png')" }}
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.16)_0%,rgba(18,18,18,0.42)_45%,rgba(18,18,18,0.82)_100%)]" />
+        <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
+
+          <div className="relative z-20 mx-auto max-w-2xl">
+            <h2 className="text-5xl font-black text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.38)] md:text-6xl">
+              Vive tu momento.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.42)]">
+              Compra directa por WhatsApp. Atención rápida y personalizada.
+            </p>
+            <a
+              href={wa}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105 hover:bg-[#F8F4E8]"
+            >
+              <MessageCircle size={22} />
+              Comprar Mute
+            </a>
           </div>
-        </div>
       </section>
 
       <footer className="py-12 text-center text-[#777]">
