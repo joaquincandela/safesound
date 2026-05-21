@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 
 const wa = "https://wa.me/51968255972";
+const instagram =
+  "https://www.instagram.com/safesound.pe?igsh=MTFtMnI2ZXNwdms5Zg%3D%3D&utm_source=qr";
 
 const sectionImageClass =
   "relative z-10 w-full rounded-[2rem] border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)]";
@@ -124,14 +126,46 @@ export default function SafeSound() {
             </a>
           </nav>
 
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full bg-[#B7FF00] px-6 py-3 font-black text-black shadow-[0_0_25px_rgba(183,255,0,0.45)] transition hover:scale-105"
-          >
-            Comprar ahora
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href={wa}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="WhatsApp SafeSound"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_25px_rgba(183,255,0,0.45)] transition hover:scale-105"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 32 32"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M19.11 17.21c-.29-.15-1.69-.84-1.95-.94-.26-.1-.45-.15-.64.15-.19.29-.74.94-.91 1.13-.17.19-.33.22-.62.08-.29-.15-1.2-.44-2.29-1.39-.85-.76-1.42-1.69-1.59-1.98-.17-.29-.02-.45.13-.6.13-.13.29-.33.43-.5.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.08-.15-.64-1.54-.88-2.11-.23-.56-.47-.48-.64-.49l-.55-.01c-.19 0-.5.07-.76.36-.26.29-1 1-.99 2.43 0 1.43 1.03 2.81 1.17 3 .15.19 2.02 3.08 4.89 4.32.68.29 1.21.47 1.62.6.68.22 1.31.19 1.8.12.55-.08 1.69-.69 1.93-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.19-.55-.33Z" />
+                <path d="M16.01 3.2c-7.05 0-12.77 5.72-12.77 12.77 0 2.25.59 4.45 1.7 6.38L3.2 28.8l6.62-1.7a12.7 12.7 0 0 0 6.19 1.58h.01c7.05 0 12.78-5.72 12.78-12.77S23.06 3.2 16.01 3.2Zm0 23.42h-.01a10.6 10.6 0 0 1-5.41-1.49l-.39-.23-3.93 1.01 1.05-3.84-.25-.4a10.58 10.58 0 0 1-1.63-5.66c0-5.85 4.76-10.61 10.61-10.61 2.84 0 5.5 1.1 7.5 3.1a10.52 10.52 0 0 1 3.11 7.51c0 5.85-4.76 10.61-10.61 10.61Z" />
+              </svg>
+            </a>
+
+            <a
+              href={instagram}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Instagram SafeSound"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[#DDD6D0] bg-white text-[#7B2CFF] shadow-sm transition hover:scale-105 hover:border-[#7B2CFF] hover:shadow-[0_0_24px_rgba(123,44,255,0.18)]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm8.36 1.72H7.89A4.17 4.17 0 0 0 3.72 7.89v8.22a4.17 4.17 0 0 0 4.17 4.17h8.22a4.17 4.17 0 0 0 4.17-4.17V7.89a4.17 4.17 0 0 0-4.17-4.17Zm-4.11 3.64A4.64 4.64 0 1 1 7.36 12 4.64 4.64 0 0 1 12 7.36Zm0 1.72A2.92 2.92 0 1 0 14.92 12 2.92 2.92 0 0 0 12 9.08Zm4.83-2.02a1.11 1.11 0 1 1-1.11 1.11 1.11 1.11 0 0 1 1.11-1.11Z" />
+              </svg>
+            </a>
+          </div>
         </div>
       </header>
 
