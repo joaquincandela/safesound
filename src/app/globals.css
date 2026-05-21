@@ -19,6 +19,10 @@
 }
 
 @layer components {
+  .float-slow {
+    animation: float-slow 6.5s ease-in-out infinite;
+  }
+
   .neon-text {
     text-shadow: 0 0 10px currentColor;
   }
@@ -35,5 +39,16 @@
       rgba(139, 115, 85, 0.05) 50%,
       transparent 100%
     );
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0) scale(1.015);
   }
 }

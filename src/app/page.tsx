@@ -28,6 +28,7 @@ const benefitCards = [
     icon: Volume2,
     title: "Conciertos & fiestas",
     text: "Reduce el volumen agresivo manteniendo la experiencia.",
+    backgroundImage: "/images/eventos.ear.png",
   },
   {
     icon: Briefcase,
@@ -211,18 +212,64 @@ export default function SafeSound() {
         id="benefits"
         className="mx-auto grid max-w-7xl gap-6 px-6 py-10 md:grid-cols-3"
       >
-        {benefitCards.map(({ icon: Icon, title, text }) => (
-          <div
-            key={title}
-            className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            <div className="text-[#7B2CFF]">
+        {benefitCards.map(({ backgroundImage, icon: Icon, title, text }) => {
+          const cardBackgroundImage =
+            backgroundImage ??
+            (title === "Trabajo & estudio"
+              ? "/images/work.ear.png"
+              : title === "Sueño & viajes"
+                ? "/images/sleep.ear.png"
+                : undefined);
+
+          return (
+            <div
+              key={title}
+              className={`group relative overflow-hidden rounded-[2rem] border p-8 transition duration-500 hover:-translate-y-1 hover:shadow-xl ${
+                cardBackgroundImage
+                  ? "border-white/10 bg-[#252525] shadow-[0_18px_50px_rgba(0,0,0,0.22)]"
+                  : "border-[#DDD6D0] bg-white shadow-sm"
+              }`}
+            >
+              {cardBackgroundImage ? (
+              <>
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
+                  style={{ backgroundImage: `url('${cardBackgroundImage}')` }}
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.14)_0%,rgba(8,8,8,0.34)_38%,rgba(8,8,8,0.72)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
+                <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
+              </>
+            ) : null}
+
+            <div
+              className={`relative z-10 ${
+                cardBackgroundImage ? "text-[#B7FF00]" : "text-[#7B2CFF]"
+              }`}
+            >
               <Icon />
             </div>
-            <h3 className="mt-5 text-2xl font-black">{title}</h3>
-            <p className="mt-3 leading-relaxed text-[#666]">{text}</p>
-          </div>
-        ))}
+            <h3
+              className={`relative z-10 mt-5 text-2xl font-black ${
+                cardBackgroundImage
+                  ? "max-w-[14rem] text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]"
+                  : "text-[#252525]"
+              }`}
+            >
+              {title}
+            </h3>
+            <p
+              className={`relative z-10 mt-3 leading-relaxed ${
+                cardBackgroundImage
+                  ? "max-w-[16rem] text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.52)]"
+                  : "text-[#666]"
+              }`}
+            >
+              {text}
+            </p>
+            </div>
+          );
+        })}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16">
@@ -465,22 +512,33 @@ export default function SafeSound() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="rounded-[2rem] bg-gradient-to-r from-[#7B2CFF] to-[#B7FF00] p-14 text-center">
-          <h2 className="text-5xl font-black text-white md:text-6xl">
+        <div className="group relative overflow-hidden rounded-[2rem] border border-white/10 p-14 text-center shadow-[0_28px_90px_rgba(0,0,0,0.24)]">
+          <div
+            className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
+            style={{ backgroundImage: "url('/images/logo.ear.png')" }}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.18)_0%,rgba(18,18,18,0.46)_48%,rgba(18,18,18,0.82)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.28),transparent_34%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.18),transparent_38%)]" />
+          <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
+          <div className="pointer-events-none absolute left-1/2 top-8 z-10 h-28 w-28 -translate-x-1/2 rounded-full border border-white/18 bg-[radial-gradient(circle,#ffffff_0%,#ffffffb3_18%,#B7FF00_42%,#7B2CFF_76%,transparent_100%)] opacity-70 blur-[2px] float-slow" />
+          <div className="pointer-events-none absolute left-1/2 top-7 z-10 h-36 w-36 -translate-x-1/2 rounded-full bg-[#B7FF00]/18 blur-3xl float-slow" />
+          <div className="relative z-20">
+          <h2 className="text-5xl font-black text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.38)] md:text-6xl">
             Vive tu momento.
           </h2>
-          <p className="mt-5 text-lg text-white/90">
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.42)]">
             Compra directa por WhatsApp. Atención rápida y personalizada.
           </p>
           <a
             href={wa}
             target="_blank"
             rel="noreferrer"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105"
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105 hover:bg-[#F8F4E8]"
           >
             <MessageCircle size={22} />
             Comprar Mute
           </a>
+          </div>
         </div>
       </section>
 
