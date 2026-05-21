@@ -1,243 +1,500 @@
 "use client";
 
-export default function Home() {
-  const phone = "51968255972";
-  const whatsapp = `https://wa.me/${phone}`;
+import { useState } from "react";
+import Image from "next/image";
+import {
+  ChevronLeft,
+  ChevronRight,
+  MessageCircle,
+  Volume2,
+  Briefcase,
+  Moon,
+  Star,
+  Building2,
+  HeartPulse,
+  ShieldCheck,
+  Feather,
+  RefreshCw,
+  Cross,
+} from "lucide-react";
+
+const wa = "https://wa.me/51968255972";
+
+const sectionImageClass =
+  "relative z-10 w-full rounded-[2rem] border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)]";
+
+const benefitCards = [
+  {
+    icon: Volume2,
+    title: "Conciertos & fiestas",
+    text: "Reduce el volumen agresivo manteniendo la experiencia.",
+  },
+  {
+    icon: Briefcase,
+    title: "Trabajo & estudio",
+    text: "Más enfoque y menos distracciones en tu día.",
+  },
+  {
+    icon: Moon,
+    title: "Sueño & viajes",
+    text: "Descansa mejor y viaja con tranquilidad.",
+  },
+];
+
+const benefitBarItems = [
+  { icon: Volume2, title: "Reduce el ruido", text: "sin aislarte" },
+  { icon: ShieldCheck, title: "Sonido claro", text: "menos saturación" },
+  { icon: Feather, title: "Cómodos", text: "todo el día" },
+  { icon: RefreshCw, title: "Reutilizables", text: "y lavables" },
+  { icon: Cross, title: "Silicona médica", text: "hipoalergénica" },
+];
+
+const reviews = [
+  "Los usé en una fiesta y se sintieron demasiado cómodos.",
+  "Me ayudaron a estudiar sin sentirme aislado.",
+  "Se ven premium y el estuche está brutal.",
+];
+
+type ProductSlide = {
+  alt: string;
+  caption: string;
+  src: string;
+};
+
+const productSlides: ProductSlide[] = [
+  {
+    src: "/images/mute-case-hd.png",
+    alt: "Estuche Mute con los earplugs en su interior",
+    caption: "Estuche premium",
+  },
+  {
+    src: "/images/publicmute.png",
+    alt: "Detalle frontal de los earplugs SafeSound",
+    caption: "Vista del producto",
+  },
+  {
+    src: "/images/product-lifestyle.png",
+    alt: "Producto SafeSound en una composiciÃ³n lifestyle",
+    caption: "Lifestyle premium",
+  },
+];
+
+export default function SafeSound() {
+  const [activeProductSlide, setActiveProductSlide] = useState(0);
+  const [brokenSlides, setBrokenSlides] = useState<Record<string, boolean>>({});
+
+  const currentProductSlide = productSlides[activeProductSlide];
+  const isCurrentSlideBroken = Boolean(brokenSlides[currentProductSlide.src]);
+
+  const goToPreviousSlide = () => {
+    setActiveProductSlide((current) =>
+      current === 0 ? productSlides.length - 1 : current - 1
+    );
+  };
+
+  const goToNextSlide = () => {
+    setActiveProductSlide((current) =>
+      current === productSlides.length - 1 ? 0 : current + 1
+    );
+  };
 
   return (
-    <main className="bg-primary-50 text-neutral-50 relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="fixed inset-0 gradient-radial opacity-50 pointer-events-none" />
-      
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-50 border-b border-primary-100 bg-primary-50/80 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black tracking-tight">
-              SAFE<span className="text-minimal-beige">SOUND</span>
+    <main className="min-h-screen overflow-x-hidden bg-[#F4F1EF] text-[#252525]">
+      <header className="sticky top-0 z-50 border-b border-[#DDD6D0] bg-[#F4F1EF]/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight md:text-4xl">
+              SAFE<span className="text-[#B7FF00]">SOUND</span>
             </h1>
-            <p className="text-xs text-neutral-100 tracking-widest uppercase">MUTE THE NOISE</p>
+            <p className="text-xs tracking-[0.45em] text-[#7B2CFF]">
+              MUTE THE NOISE
+            </p>
           </div>
 
+          <nav className="hidden gap-10 font-semibold text-[#555] md:flex">
+            <a href="#mute" className="transition hover:text-[#7B2CFF]">
+              Mute
+            </a>
+            <a href="#empresas" className="transition hover:text-[#7B2CFF]">
+              Empresas
+            </a>
+            <a href="#healthy" className="transition hover:text-[#7B2CFF]">
+              Healthy Sound
+            </a>
+          </nav>
+
           <a
-            href={whatsapp}
+            href={wa}
             target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#25D366] text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/50"
+            rel="noreferrer"
+            className="rounded-full bg-[#B7FF00] px-6 py-3 font-black text-black shadow-[0_0_25px_rgba(183,255,0,0.45)] transition hover:scale-105"
           >
-            WhatsApp
+            Comprar ahora
           </a>
         </div>
       </header>
 
-      {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center relative">
-        <div className="z-10">
-          <p className="text-minimal-sand uppercase tracking-[0.3em] text-sm font-medium">
+      <section
+        id="mute"
+        className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-2"
+      >
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#7B2CFF22,transparent_25%),radial-gradient(circle_at_80%_30%,#B7FF0022,transparent_25%)]" />
+
+        <div>
+          <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-[#7B2CFF]">
+            <Volume2 size={20} />
             Protección auditiva premium
+          </div>
+
+          <h1 className="mt-6 text-7xl font-black tracking-tight leading-none text-[#252525] md:text-8xl lg:text-9xl">
+            MUTE
+          </h1>
+
+          <div className="mt-4 h-1.5 w-28 rounded-full bg-gradient-to-r from-[#7B2CFF] via-[#7B2CFF]/70 to-transparent" />
+
+          <p className="mt-6 max-w-xl text-xl leading-relaxed text-[#555]">
+            Earplugs premium diseñados para reducir el ruido sin aislarte.
+            Diseñados para conciertos, trabajo, estudio, viajes y descanso.
           </p>
 
-          <h2 className="text-6xl md:text-7xl font-black mt-6 leading-[0.95]">
-            Silencia el ruido.
-            <br />
-            <span className="text-minimal-beige">Vive mejor.</span>
-          </h2>
-
-          <p className="mt-6 text-neutral-100 text-xl max-w-xl leading-relaxed">
-            Earplugs diseñados para conciertos, trabajo, estudio, viajes y descanso. 
-            Protección moderna con estilo premium para tu lifestyle.
-          </p>
-
-          <div className="mt-8 flex gap-4 flex-wrap">
+          <div className="mt-10 flex flex-wrap gap-4">
             <a
-              href={whatsapp}
+              href={wa}
               target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#25D366] text-white px-8 py-4 rounded-full font-bold hover:scale-105 transition-all duration-300 hover:shadow-[0_0_20px_#25D366]"
+              rel="noreferrer"
+              className="rounded-full bg-[#B7FF00] px-8 py-4 font-black text-black transition hover:scale-105"
             >
-              Comprar Ahora
+              Comprar Mute
             </a>
-
             <a
-              href="#beneficios"
-              className="border border-minimal-sand text-minimal-sand px-8 py-4 rounded-full hover:bg-minimal-sand hover:text-primary-50 transition-all duration-300"
+              href="#benefits"
+              className="rounded-full border-2 border-[#7B2CFF] px-8 py-4 font-bold text-[#7B2CFF] transition hover:bg-[#7B2CFF] hover:text-white"
             >
-              Ver Más
+              Ver beneficios
             </a>
           </div>
-        </div>
 
-        {/* PRODUCT VISUAL */}
-        <div className="relative z-10">
-          <div className="relative overflow-hidden rounded-[3rem]">
-            <img 
-              src="/images/earplugsafesound.png" 
-              alt="Background" 
-              className="w-full h-full object-cover opacity-90"
-            />
-            
-            {/* Small logo in top-right corner with dynamic effects */}
-            <div className="absolute top-4 right-4">
-              <div className="relative animate-float">
-                <div className="w-12 h-6 rounded-full border-2 border-[#39FF14] flex items-center justify-end px-2 shadow-lg shadow-green-500/30">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#39FF14] to-[#00E5FF] shadow-xl shadow-green-500/50" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#A100FF] animate-pulse" />
-                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse delay-75" />
-              </div>
+          <div className="mt-12 grid grid-cols-3 gap-5 rounded-[2rem] border border-[#DDD6D0] bg-white/70 p-6 backdrop-blur">
+            <div className="text-center">
+              <Volume2 className="mx-auto text-[#7B2CFF]" size={30} />
+              <p className="mt-3 font-black">Reduce ruido</p>
+              <span className="text-sm text-[#666]">hasta 23dB</span>
+            </div>
+            <div className="text-center">
+              <ShieldCheck className="mx-auto text-[#7B2CFF]" size={30} />
+              <p className="mt-3 font-black">Protección</p>
+              <span className="text-sm text-[#666]">certificada</span>
+            </div>
+            <div className="text-center">
+              <Feather className="mx-auto text-[#7B2CFF]" size={30} />
+              <p className="mt-3 font-black">Ultra cómodos</p>
+              <span className="text-sm text-[#666]">y ligeros</span>
             </div>
           </div>
         </div>
+
+        <div className="relative flex items-center justify-center">
+          <div className="absolute h-[500px] w-[500px] rounded-full bg-[#B7FF00]/25 blur-[120px]" />
+          <Image
+            src="/images/mute-hero-hd.png"
+            alt="Render premium de los earplugs Mute 1"
+            width={1254}
+            height={1254}
+            priority
+            sizes="(min-width: 1024px) 44rem, 100vw"
+            className={sectionImageClass}
+          />
+        </div>
       </section>
 
-      {/* BENEFITS */}
       <section
-        id="beneficios"
-        className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-8"
+        id="benefits"
+        className="mx-auto grid max-w-7xl gap-6 px-6 py-10 md:grid-cols-3"
       >
-        {[
-          {
-            title: "Conciertos & Fiestas",
-            description: "Disfruta la música sin dañar tus oídos. Reduce el decibelio sin perder la experiencia.",
-            icon: "🎵"
-          },
-          {
-            title: "Trabajo & Estudio",
-            description: "Más enfoque y cero distracciones. Perfecto para ambientes ruidosos y concentración.",
-            icon: "🎯"
-          },
-          {
-            title: "Sueño & Viajes",
-            description: "Descanso profundo donde sea. Ideal para dormir y viajar en paz total.",
-            icon: "✈️"
-          }
-        ].map((item, i) => (
+        {benefitCards.map(({ icon: Icon, title, text }) => (
           <div
-            key={i}
-            className="bg-primary-100 p-8 rounded-3xl border border-primary-100 hover:border-minimal-sand/50 transition-all duration-300 group"
+            key={title}
+            className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
           >
-            <div className="text-4xl mb-4">{item.icon}</div>
-            <h3 className="text-2xl font-bold text-minimal-beige mb-4">{item.title}</h3>
-            <p className="text-neutral-100 leading-relaxed">{item.description}</p>
+            <div className="text-[#7B2CFF]">
+              <Icon />
+            </div>
+            <h3 className="mt-5 text-2xl font-black">{title}</h3>
+            <p className="mt-3 leading-relaxed text-[#666]">{text}</p>
           </div>
         ))}
       </section>
 
-      {/* WHY SAFESOUND */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="rounded-[3rem] bg-primary-100 border border-primary-100 p-12 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-minimal-brown/5 to-minimal-sand/5" />
-          <div className="relative z-10">
-            <h3 className="text-5xl font-black mb-6">
-              ¿Por qué <span className="text-minimal-beige">SafeSound</span>?
-            </h3>
-
-            <div className="grid md:grid-cols-2 gap-8 mt-12">
-              <div>
-                <h4 className="text-2xl font-bold text-minimal-sand mb-4">No es médico, es lifestyle</h4>
-                <p className="text-neutral-100 text-lg leading-relaxed">
-                  Somos una solución moderna para el ruido diario. Pensado para personas activas que valoran 
-                  diseño, comodidad y protección en su día a día.
-                </p>
-              </div>
-              <div>
-                <h4 className="text-2xl font-bold text-minimal-brown mb-4">Diseño que te representa</h4>
-                <p className="text-neutral-100 text-lg leading-relaxed">
-                  Estilo minimalista, tecnología avanzada y comodidad premium. Porque tu protección 
-                  auditiva debe ser tan cool como tú.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* REVIEWS */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <h3 className="text-4xl font-black text-center mb-16">
-          Lo que dicen <span className="text-minimal-beige">nuestros clientes</span>
-        </h3>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            {
-              name: "Carlos M.",
-              rating: 5,
-              text: "Los mejores earplugs que he usado. Perfectos para conciertos, sigo la música pero sin el daño en los oídos.",
-              role: "Músico"
-            },
-            {
-              name: "Ana L.",
-              rating: 5,
-              text: "Trabajo en coworking y estos son salvavidas. Me concentro como nunca y el diseño es increíble.",
-              role: "Designer"
-            },
-            {
-              name: "Diego R.",
-              rating: 5,
-              text: "Viajo mucho y duermo como un bebé. Compré varios para regalar, todos encantados.",
-              role: "Digital Nomad"
-            }
-          ].map((review, i) => (
-            <div key={i} className="bg-primary-100 p-8 rounded-3xl border border-primary-100">
-              <div className="flex mb-4">
-                {[...Array(review.rating)].map((_, j) => (
-                  <span key={j} className="text-minimal-beige text-xl">★</span>
-                ))}
-              </div>
-              <p className="text-neutral-100 mb-6 italic">"{review.text}"</p>
-              <div>
-                <p className="font-bold text-neutral-50">{review.name}</p>
-                <p className="text-minimal-sand text-sm">{review.role}</p>
-              </div>
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="grid gap-6 rounded-[2rem] border border-[#DDD6D0] bg-white p-6 md:grid-cols-5">
+          {benefitBarItems.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="text-center">
+              <Icon className="mx-auto text-[#7B2CFF]" size={34} />
+              <h3 className="mt-3 font-black">{title}</h3>
+              <p className="text-sm text-[#666]">{text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <div className="rounded-[3rem] p-16 bg-gradient-to-r from-minimal-beige via-minimal-brown to-minimal-sand text-primary-50 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-black/20" />
-          <div className="relative z-10">
-            <h3 className="text-5xl font-black mb-6">Protege tus oídos hoy</h3>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Compra directa por WhatsApp. Atención rápida y personalizada. 
-              Envíos a todo el país.
-            </p>
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-white text-[#25D366] px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/50"
-            >
-              Comprar Ahora
-            </a>
+      <section className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 lg:grid-cols-2">
+        <div className="relative">
+          <div className="absolute h-[400px] w-[400px] rounded-full bg-[#7B2CFF]/20 blur-[100px]" />
+          <div className="relative overflow-hidden rounded-[2rem]">
+            <div className="relative min-h-[22rem] sm:min-h-[28rem]">
+              <div className="absolute left-5 top-5 z-20 rounded-full border border-white/15 bg-[#252525]/78 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-white/85 backdrop-blur">
+                {currentProductSlide.caption}
+              </div>
+
+              {isCurrentSlideBroken ? (
+                <div className="relative z-10 flex min-h-[22rem] w-full items-end rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,#7B2CFF33,transparent_35%),linear-gradient(160deg,#252525_0%,#1C1C1C_60%,#101010_100%)] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.32)] sm:min-h-[28rem]">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#B7FF00]">
+                      Visual pendiente
+                    </p>
+                    <h3 className="mt-4 text-3xl font-black tracking-tight text-white">
+                      Product Lifestyle
+                    </h3>
+                    <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/72">
+                      Agrega `/images/product-lifestyle.png` para mostrar esta
+                      vista. El carrusel ya estÃ¡ preparado sin romper la web.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <Image
+                  key={currentProductSlide.src}
+                  src={currentProductSlide.src}
+                  alt={currentProductSlide.alt}
+                  width={1254}
+                  height={1254}
+                  quality={100}
+                  sizes="(min-width: 1024px) 38rem, 100vw"
+                  onError={() =>
+                    setBrokenSlides((current) => ({
+                      ...current,
+                      [currentProductSlide.src]: true,
+                    }))
+                  }
+                  className="relative z-10 w-full rounded-[2rem] object-cover border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)] transition-all duration-500 ease-out"
+                />
+              )}
+
+              <button
+                type="button"
+                aria-label="Imagen anterior"
+                onClick={goToPreviousSlide}
+                className="absolute left-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#252525]/78 text-white backdrop-blur transition hover:scale-105 hover:bg-[#7B2CFF]"
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <button
+                type="button"
+                aria-label="Siguiente imagen"
+                onClick={goToNextSlide}
+                className="absolute right-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#252525]/78 text-white backdrop-blur transition hover:scale-105 hover:bg-[#7B2CFF]"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+            <div className="mt-5 flex items-center justify-center gap-3">
+              {productSlides.map((slide, index) => {
+                const isActive = index === activeProductSlide;
+
+                return (
+                  <button
+                    key={slide.src}
+                    type="button"
+                    aria-label={`Ver imagen ${index + 1}`}
+                    aria-pressed={isActive}
+                    onClick={() => setActiveProductSlide(index)}
+                    className={`h-3 rounded-full transition-all duration-300 ${
+                      isActive
+                        ? "w-10 bg-[#7B2CFF]"
+                        : "w-3 bg-[#252525]/20 hover:bg-[#252525]/40"
+                    }`}
+                  />
+                );
+              })}
+            </div>
           </div>
+        </div>
+
+        <div>
+          <p className="font-bold uppercase tracking-widest text-[#7B2CFF]">
+            Producto principal
+          </p>
+          <h2 className="mt-5 text-6xl font-black">Mute</h2>
+          <p className="mt-6 text-lg leading-relaxed text-[#555]">
+            Incluye earplugs premium, estuche portátil y diseño pensado para
+            acompañarte todos los días. Protección auditiva moderna con estética
+            premium.
+          </p>
+
+          <div className="mt-10 space-y-5">
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="text-[#B7FF00]" />
+              Protección auditiva cómoda
+            </div>
+            <div className="flex items-center gap-3">
+              <Volume2 className="text-[#B7FF00]" />
+              Sonido más claro y controlado
+            </div>
+            <div className="flex items-center gap-3">
+              <Feather className="text-[#B7FF00]" />
+              Diseño ligero y elegante
+            </div>
+          </div>
+
+          <a
+            href={wa}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
+          >
+            <MessageCircle size={22} />
+            Pedir por WhatsApp
+          </a>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="text-center py-12 text-neutral-100 border-t border-primary-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <h4 className="text-2xl font-black mb-4">
-            SAFE<span className="text-minimal-beige">SOUND</span>
-          </h4>
-          <p className="text-sm mb-4">© 2026 SafeSound • Mute the Noise</p>
-          <p className="text-xs text-neutral-100">
-            Next.js 15 • TailwindCSS • Premium Lifestyle Protection
-          </p>
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <h2 className="text-center text-5xl font-black">Comentarios reales</h2>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {reviews.map((review) => (
+            <div
+              key={review}
+              className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8"
+            >
+              <div className="flex gap-1 text-[#B7FF00]">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <Star key={n} size={18} fill="currentColor" />
+                ))}
+              </div>
+              <p className="mt-5 leading-relaxed text-[#555]">{review}</p>
+            </div>
+          ))}
         </div>
+      </section>
+
+      <section
+        id="empresas"
+        className="mx-auto grid max-w-7xl items-center gap-16 px-6 py-24 lg:grid-cols-2"
+      >
+        <div className="relative">
+          <div className="absolute inset-0 rounded-[2rem] bg-black/10" />
+          <Image
+            src="/images/mute-empresas-hd.png"
+            alt="Presentación premium de SafeSound para empresas"
+            width={1254}
+            height={1254}
+            sizes="(min-width: 1024px) 40rem, 100vw"
+            className={sectionImageClass}
+          />
+        </div>
+
+        <div>
+          <Building2 className="text-[#7B2CFF]" size={50} />
+          <h2 className="mt-6 text-6xl font-black">Empresas</h2>
+          <p className="mt-6 text-lg leading-relaxed text-[#555]">
+            SafeSound para empresas está diseñado para oficinas, coworkings,
+            eventos corporativos y equipos expuestos a ruido constante.
+          </p>
+          <p className="mt-4 text-lg leading-relaxed text-[#555]">
+            Más que un accesorio, es una herramienta moderna para mejorar
+            concentración, comodidad y bienestar dentro del entorno laboral.
+          </p>
+          <p className="mt-4 text-lg leading-relaxed text-[#555]">
+            Una solución premium para empresas que quieren ofrecer una
+            experiencia diferente y útil a trabajadores o clientes.
+          </p>
+
+          <a
+            href={wa}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-10 inline-block rounded-full bg-[#252525] px-8 py-4 font-black text-white transition hover:scale-105"
+          >
+            Cotizar para empresas
+          </a>
+        </div>
+      </section>
+
+      <section
+        id="healthy"
+        className="mx-auto grid max-w-7xl items-center gap-16 px-6 py-24 lg:grid-cols-2"
+      >
+        <div>
+          <HeartPulse className="text-[#B7FF00]" size={50} />
+          <h2 className="mt-6 text-6xl font-black">Healthy Sound</h2>
+          <p className="mt-6 text-lg leading-relaxed text-[#555]">
+            Una línea enfocada en educación, bienestar auditivo y conciencia
+            sobre el impacto del ruido en la vida diaria.
+          </p>
+          <p className="mt-4 text-lg leading-relaxed text-[#555]">
+            Pensado para estudiantes, trabajadores, personas sensibles al ruido
+            y usuarios que buscan proteger su salud auditiva sin perder estilo.
+          </p>
+          <p className="mt-4 text-lg leading-relaxed text-[#555]">
+            Porque cuidar tus oídos también puede formar parte de tu lifestyle.
+          </p>
+
+          <a
+            href={wa}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-10 inline-block rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
+          >
+            Saber más
+          </a>
+        </div>
+
+        <div className="relative">
+          <div className="absolute h-[450px] w-[450px] rounded-full bg-[#B7FF00]/20 blur-[100px]" />
+          <Image
+            src="/images/mute-healthy-hd.png"
+            alt="Earplugs SafeSound en una composición enfocada en bienestar auditivo"
+            width={1254}
+            height={1254}
+            sizes="(min-width: 1024px) 40rem, 100vw"
+            className={sectionImageClass}
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="rounded-[2rem] bg-gradient-to-r from-[#7B2CFF] to-[#B7FF00] p-14 text-center">
+          <h2 className="text-5xl font-black text-white md:text-6xl">
+            Vive tu momento.
+          </h2>
+          <p className="mt-5 text-lg text-white/90">
+            Compra directa por WhatsApp. Atención rápida y personalizada.
+          </p>
+          <a
+            href={wa}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105"
+          >
+            <MessageCircle size={22} />
+            Comprar Mute
+          </a>
+        </div>
+      </section>
+
+      <footer className="py-12 text-center text-[#777]">
+        © 2026 SafeSound - Mute the Noise
       </footer>
 
-      {/* FLOATING WHATSAPP BUTTON */}
       <a
-        href={whatsapp}
+        href={wa}
         target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-8 right-8 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-2xl hover:scale-110 transition-all duration-300 animate-glow z-50"
+        rel="noreferrer"
+        className="fixed bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_35px_rgba(183,255,0,0.75)] transition hover:scale-110"
       >
-        W
+        <MessageCircle size={30} />
       </a>
     </main>
   );
