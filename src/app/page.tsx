@@ -146,7 +146,7 @@ export default function SafeSound() {
 
           <nav className="hidden gap-10 font-semibold text-[#555] md:flex">
             <a href="#mute" className="transition hover:text-[#7B2CFF]">
-              Mute
+              VOID
             </a>
             <a href="#empresas" className="transition hover:text-[#7B2CFF]">
               Empresas
@@ -212,7 +212,7 @@ export default function SafeSound() {
           </div>
 
           <h1 className="mt-6 text-7xl font-black tracking-tight leading-none text-[#252525] md:text-8xl lg:text-9xl">
-            MUTE
+            V O I D
           </h1>
 
           <div className="mt-4 h-1.5 w-28 rounded-full bg-gradient-to-r from-[#7B2CFF] via-[#7B2CFF]/70 to-transparent" />
@@ -229,7 +229,7 @@ export default function SafeSound() {
               rel="noreferrer"
               className="rounded-full bg-[#B7FF00] px-8 py-4 font-black text-black transition hover:scale-105"
             >
-              Comprar Mute
+              Comprar
             </a>
             <a
               href="#benefits"
@@ -437,7 +437,7 @@ export default function SafeSound() {
           <p className="font-bold uppercase tracking-widest text-[#7B2CFF]">
             Producto principal
           </p>
-          <h2 className="mt-5 text-6xl font-black">Mute</h2>
+          <h2 className="mt-5 text-6xl font-black">VOID</h2>
           <p className="mt-6 text-lg leading-relaxed text-[#555]">
             Incluye earplugs premium, estuche portátil y diseño pensado para
             acompañarte todos los días. Protección auditiva moderna con estética
@@ -466,7 +466,7 @@ export default function SafeSound() {
                   Desde
                 </p>
                 <p className="mt-2 text-4xl font-black tracking-tight text-[#252525] md:text-5xl">
-                  S/50
+                  S/65
                 </p>
               </div>
 
