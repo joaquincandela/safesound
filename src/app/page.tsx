@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Cross,
 } from "lucide-react";
+import PurchaseModal from "../components/PurchaseModal";
 
 const wa = "https://wa.me/51968255972";
 const instagram =
@@ -115,6 +116,10 @@ const productSlides: ProductSlide[] = [
 export default function SafeSound() {
   const [activeProductSlide, setActiveProductSlide] = useState(0);
   const [brokenSlides, setBrokenSlides] = useState<Record<string, boolean>>({});
+  const [modal, setModal] = useState<{
+    variant: "compra" | "empresa" | "healthy";
+    product?: string;
+  } | null>(null);
 
   const currentProductSlide = productSlides[activeProductSlide];
   const isCurrentSlideBroken = Boolean(brokenSlides[currentProductSlide.src]);
@@ -157,10 +162,9 @@ export default function SafeSound() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <a
-              href={wa}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => setModal({ variant: "compra" })}
               aria-label="WhatsApp SafeSound"
               className="flex h-12 w-12 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_25px_rgba(183,255,0,0.45)] transition hover:scale-105"
             >
@@ -175,7 +179,7 @@ export default function SafeSound() {
                 <path d="M19.11 17.21c-.29-.15-1.69-.84-1.95-.94-.26-.1-.45-.15-.64.15-.19.29-.74.94-.91 1.13-.17.19-.33.22-.62.08-.29-.15-1.2-.44-2.29-1.39-.85-.76-1.42-1.69-1.59-1.98-.17-.29-.02-.45.13-.6.13-.13.29-.33.43-.5.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.08-.15-.64-1.54-.88-2.11-.23-.56-.47-.48-.64-.49l-.55-.01c-.19 0-.5.07-.76.36-.26.29-1 1-.99 2.43 0 1.43 1.03 2.81 1.17 3 .15.19 2.02 3.08 4.89 4.32.68.29 1.21.47 1.62.6.68.22 1.31.19 1.8.12.55-.08 1.69-.69 1.93-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.19-.55-.33Z" />
                 <path d="M16.01 3.2c-7.05 0-12.77 5.72-12.77 12.77 0 2.25.59 4.45 1.7 6.38L3.2 28.8l6.62-1.7a12.7 12.7 0 0 0 6.19 1.58h.01c7.05 0 12.78-5.72 12.78-12.77S23.06 3.2 16.01 3.2Zm0 23.42h-.01a10.6 10.6 0 0 1-5.41-1.49l-.39-.23-3.93 1.01 1.05-3.84-.25-.4a10.58 10.58 0 0 1-1.63-5.66c0-5.85 4.76-10.61 10.61-10.61 2.84 0 5.5 1.1 7.5 3.1a10.52 10.52 0 0 1 3.11 7.51c0 5.85-4.76 10.61-10.61 10.61Z" />
               </svg>
-            </a>
+            </button>
 
             <a
               href={instagram}
@@ -223,14 +227,13 @@ export default function SafeSound() {
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
-            <a
-              href={wa}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => setModal({ variant: "compra" })}
               className="rounded-full bg-[#B7FF00] px-8 py-4 font-black text-black transition hover:scale-105"
             >
               Comprar
-            </a>
+            </button>
             <a
               href="#benefits"
               className="rounded-full border-2 border-[#7B2CFF] px-8 py-4 font-bold text-[#7B2CFF] transition hover:bg-[#7B2CFF] hover:text-white"
@@ -471,15 +474,14 @@ export default function SafeSound() {
               </div>
 
               <div className="md:flex md:justify-end md:pb-1">
-                <a
-                  href={wa}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  type="button"
+                  onClick={() => setModal({ variant: "compra" })}
                   className="inline-flex items-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
                 >
                   <MessageCircle size={22} />
                   Pedir por WhatsApp
-                </a>
+                </button>
               </div>
             </div>
 
@@ -568,14 +570,13 @@ export default function SafeSound() {
             experiencia diferente y útil a trabajadores o clientes.
           </p>
 
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={() => setModal({ variant: "empresa" })}
             className="mt-10 inline-block rounded-full bg-[#252525] px-8 py-4 font-black text-white transition hover:scale-105"
           >
             Cotizar para empresas
-          </a>
+          </button>
         </div>
       </section>
 
@@ -598,14 +599,13 @@ export default function SafeSound() {
             Porque cuidar tus oídos también puede formar parte de tu lifestyle.
           </p>
 
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={() => setModal({ variant: "healthy" })}
             className="mt-10 inline-block rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
           >
             Saber más
-          </a>
+          </button>
         </div>
 
         <div className="relative">
@@ -635,15 +635,14 @@ export default function SafeSound() {
             <p className="mx-auto mt-5 max-w-2xl text-lg text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.42)]">
               Compra directa por WhatsApp. Atención rápida y personalizada.
             </p>
-            <a
-              href={wa}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => setModal({ variant: "compra" })}
               className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105 hover:bg-[#F8F4E8]"
             >
               <MessageCircle size={22} />
               Comprar Mute
-            </a>
+            </button>
           </div>
       </section>
 
@@ -651,14 +650,21 @@ export default function SafeSound() {
         © 2026 SafeSound - Mute the Noise
       </footer>
 
-      <a
-        href={wa}
-        target="_blank"
-        rel="noreferrer"
+      <button
+        type="button"
+        onClick={() => setModal({ variant: "compra" })}
+        aria-label="Comprar por WhatsApp"
         className="fixed bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_35px_rgba(183,255,0,0.75)] transition hover:scale-110"
       >
         <MessageCircle size={30} />
-      </a>
+      </button>
+
+      <PurchaseModal
+        open={modal !== null}
+        variant={modal?.variant}
+        product={modal?.product}
+        onClose={() => setModal(null)}
+      />
     </main>
   );
 }
