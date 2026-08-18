@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import {
   ChevronLeft,
@@ -96,20 +96,51 @@ type ProductSlide = {
 };
 
 const productSlides: ProductSlide[] = [
-  {
-    src: "/images/mute-case-hd.png",
-    alt: "Estuche Mute con los earplugs en su interior",
-    caption: "Estuche premium",
-  },
-  {
-    src: "/images/publicmute.png",
-    alt: "Detalle frontal de los earplugs SafeSound",
-    caption: "Vista del producto",
-  },
+  
   {
     src: "/images/product-lifestyle.png",
     alt: "Producto SafeSound en una composición lifestyle",
     caption: "Lifestyle premium",
+  },
+  {
+    src: "/images/negrocondorado.png",
+    alt: "Color 1",
+    caption: "Color 1",
+  },
+  {
+    src: "/images/moradoconblanco.png",
+    alt: "Color 2",
+    caption: "Color 2",
+  },
+  {
+    src: "/images/plateadoconnegro.png",
+    alt: "Color 3",
+    caption: "Color 3",
+  },
+  {
+    src: "/images/plateadoconblanco.png",
+    alt: "Color 4",
+    caption: "Color 4",
+  },
+  {
+    src: "/images/transparentes.png",
+    alt: "Color 5",
+    caption: "Color 5",
+  },
+  {
+    src: "/images/trasnparenteconnegro.png",
+    alt: "Color 6",
+    caption: "Color 6",
+  },
+  {
+    src: "/images/rosadoconblanco.png",
+    alt: "Color 7",
+    caption: "Color 7",
+  },
+  {
+    src: "/images/doradoconamarillo.png",
+    alt: "Color 8",
+    caption: "Color 8",
   },
 ];
 
@@ -134,6 +165,43 @@ export default function SafeSound() {
     setActiveProductSlide((current) =>
       current === productSlides.length - 1 ? 0 : current + 1
     );
+  };
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [renderDragOffset, setRenderDragOffset] = useState(0);
+  const dragStartX = useRef(0);
+  const dragOffsetRef = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    dragStartX.current = e.clientX;
+    dragOffsetRef.current = 0;
+    setRenderDragOffset(0);
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    const diff = e.clientX - dragStartX.current;
+    dragOffsetRef.current = diff;
+    setRenderDragOffset(diff);
+  };
+
+  const handlePointerUp = () => {
+    if (!isDraggingRef.current) return;
+    const offset = dragOffsetRef.current;
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    dragOffsetRef.current = 0;
+    setRenderDragOffset(0);
+    const threshold = 80;
+    if (offset < -threshold) {
+      goToNextSlide();
+    } else if (offset > threshold) {
+      goToPreviousSlide();
+    }
   };
 
   return (
@@ -354,69 +422,107 @@ export default function SafeSound() {
       <section className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 lg:grid-cols-2">
         <div className="relative">
           <div className="absolute h-[400px] w-[400px] rounded-full bg-[#7B2CFF]/20 blur-[100px]" />
-          <div className="relative overflow-hidden rounded-[2rem]">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Galería de producto"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") goToPreviousSlide();
+              if (e.key === "ArrowRight") goToNextSlide();
+            }}
+            className="relative overflow-hidden rounded-[2rem] outline-none cursor-grab active:cursor-grabbing select-none touch-pan-y"
+          >
             <div className="relative min-h-[22rem] sm:min-h-[28rem]">
               <div className="absolute left-5 top-5 z-20 rounded-full border border-white/15 bg-[#252525]/78 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-white/85 backdrop-blur">
                 {currentProductSlide.caption}
               </div>
 
-              {isCurrentSlideBroken ? (
-                <div className="relative z-10 flex min-h-[22rem] w-full items-end rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,#7B2CFF33,transparent_35%),linear-gradient(160deg,#252525_0%,#1C1C1C_60%,#101010_100%)] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.32)] sm:min-h-[28rem]">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#B7FF00]">
-                      Visual pendiente
-                    </p>
-                    <h3 className="mt-4 text-3xl font-black tracking-tight text-white">
-                      Product Lifestyle
-                    </h3>
-                    <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/72">
-                      Agrega `/images/product-lifestyle.png` para mostrar esta
-                      vista. El carrusel ya está preparado sin romper la web.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <Image
-                  key={currentProductSlide.src}
-                  src={currentProductSlide.src}
-                  alt={currentProductSlide.alt}
-                  width={1254}
-                  height={1254}
-                  quality={100}
-                  sizes="(min-width: 1024px) 38rem, 100vw"
-                  onError={() =>
-                    setBrokenSlides((current) => ({
-                      ...current,
-                      [currentProductSlide.src]: true,
-                    }))
-                  }
-                  className="relative z-10 w-full rounded-[2rem] object-cover border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)] transition-all duration-500 ease-out"
-                />
-              )}
+              <div
+                className={`flex w-full ${isDragging ? "" : "transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"}`}
+                style={{
+                  transform: `translateX(calc(-${activeProductSlide * 100}% + ${isDragging ? renderDragOffset : 0}px))`,
+                  willChange: "transform",
+                }}
+              >
+                {productSlides.map((slide) => {
+                  const slideBroken = Boolean(brokenSlides[slide.src]);
+                  return (
+                    <div
+                      key={slide.src}
+                      className="relative w-full shrink-0 basis-full"
+                    >
+                      {slideBroken ? (
+                        <div className="relative z-10 flex aspect-square w-full items-end rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,#7B2CFF33,transparent_35%),linear-gradient(160deg,#252525_0%,#1C1C1C_60%,#101010_100%)] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#B7FF00]">
+                              Visual pendiente
+                            </p>
+                            <h3 className="mt-4 text-3xl font-black tracking-tight text-white">
+                              {slide.alt}
+                            </h3>
+                            <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/72">
+                              Agrega &quot;{slide.src}&quot; para mostrar esta
+                              vista.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <Image
+                          src={slide.src}
+                          alt={slide.alt}
+                          width={1254}
+                          height={1254}
+                          quality={100}
+                          draggable={false}
+                          sizes="(min-width: 1024px) 38rem, 100vw"
+                          onError={() =>
+                            setBrokenSlides((current) => ({
+                              ...current,
+                              [slide.src]: true,
+                            }))
+                          }
+                          className="relative z-10 aspect-square w-full rounded-[2rem] object-cover border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)]"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
               <button
                 type="button"
                 aria-label="Imagen anterior"
-                onClick={goToPreviousSlide}
-                className="absolute left-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#252525]/78 text-white backdrop-blur transition hover:scale-105 hover:bg-[#7B2CFF]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToPreviousSlide();
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="absolute left-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)]"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={18} strokeWidth={2.5} />
               </button>
 
               <button
                 type="button"
                 aria-label="Siguiente imagen"
-                onClick={goToNextSlide}
-                className="absolute right-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#252525]/78 text-white backdrop-blur transition hover:scale-105 hover:bg-[#7B2CFF]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNextSlide();
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="absolute right-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)]"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} strokeWidth={2.5} />
               </button>
             </div>
 
-            <div className="mt-5 flex items-center justify-center gap-3">
+            <div className="mt-5 flex items-center justify-center gap-2">
               {productSlides.map((slide, index) => {
                 const isActive = index === activeProductSlide;
-
                 return (
                   <button
                     key={slide.src}
@@ -424,10 +530,10 @@ export default function SafeSound() {
                     aria-label={`Ver imagen ${index + 1}`}
                     aria-pressed={isActive}
                     onClick={() => setActiveProductSlide(index)}
-                    className={`h-3 rounded-full transition-all duration-300 ${
+                    className={`rounded-full transition-all duration-500 ease-out ${
                       isActive
-                        ? "w-10 bg-[#7B2CFF]"
-                        : "w-3 bg-[#252525]/20 hover:bg-[#252525]/40"
+                        ? "h-2.5 w-8 bg-[#7B2CFF] shadow-[0_0_12px_rgba(123,44,255,0.4)]"
+                        : "h-2.5 w-2.5 bg-[#252525]/15 hover:bg-[#252525]/30"
                     }`}
                   />
                 );

@@ -29,7 +29,6 @@ type Props = {
 
 type FormErrors = {
   nombre?: string;
-  celular?: string;
   cantidad?: string;
   distrito?: string;
   empresa?: string;
@@ -43,7 +42,7 @@ export default function PurchaseModal({
   product = "Void",
 }: Props) {
   const [nombre, setNombre] = useState("");
-  const [celular, setCelular] = useState("");
+
   const [cantidad, setCantidad] = useState(1);
   const [distrito, setDistrito] = useState("");
   const [empresa, setEmpresa] = useState("");
@@ -64,11 +63,6 @@ export default function PurchaseModal({
   const validate = (): boolean => {
     const e: FormErrors = {};
     if (!nombre.trim()) e.nombre = "Ingresa tu nombre";
-    if (!celular.trim()) {
-      e.celular = "Ingresa tu celular";
-    } else if (!/^\d+$/.test(celular.trim())) {
-      e.celular = "Solo números";
-    }
     if (variant === "compra") {
       if (!cantidad || cantidad < 1) e.cantidad = "Mínimo 1";
       if (!distrito.trim()) e.distrito = "Ingresa tu distrito o provincia";
@@ -120,10 +114,7 @@ export default function PurchaseModal({
 
     lines.push(
       "",
-      `Mi nombre es ${nombre.trim()}.`,
-      "",
-      "Mi celular es:",
-      celular.trim()
+      `Mi nombre es ${nombre.trim()}.`
     );
 
     if (ayuda.trim()) {
@@ -215,22 +206,6 @@ export default function PurchaseModal({
               className={inputBase}
             />
             {errors.nombre && <p className="mt-1 text-xs text-red-500">{errors.nombre}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="celular" className="mb-1 block text-sm font-bold text-[#252525]">
-              Celular
-            </label>
-            <input
-              id="celular"
-              type="tel"
-              inputMode="numeric"
-              value={celular}
-              onChange={(e) => setCelular(e.target.value.replace(/\D/g, ""))}
-              placeholder="987654321"
-              className={inputBase}
-            />
-            {errors.celular && <p className="mt-1 text-xs text-red-500">{errors.celular}</p>}
           </div>
 
           <div>
