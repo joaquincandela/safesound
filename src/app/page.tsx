@@ -437,7 +437,7 @@ export default function SafeSound() {
 
       <section
         ref={purchaseSectionRef}
-        className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 lg:grid-cols-2"
+        className="mx-auto grid max-w-7xl items-start gap-12 px-6 py-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]"
       >
         <div className="relative">
           <div className="absolute h-[400px] w-[400px] rounded-full bg-[#7B2CFF]/20 blur-[100px]" />
@@ -535,21 +535,21 @@ export default function SafeSound() {
           </div>
         </div>
 
-        <div>
+        <div className="w-full lg:max-w-[35rem]">
           <p className="font-bold uppercase tracking-widest text-[#7B2CFF]">
             Producto principal
           </p>
           <div className="mt-5 flex flex-wrap items-end gap-4">
-            <h2 className="text-6xl font-black">{VOID_PRODUCT_NAME}</h2>
-            <p className="pb-2 text-3xl font-black text-[#252525]">{VOID_PRICE_LABEL}</p>
+            <h2 className="text-5xl font-black xl:text-6xl">{VOID_PRODUCT_NAME}</h2>
+            <p className="pb-1 text-2xl font-black text-[#252525]">{VOID_PRICE_LABEL}</p>
           </div>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#555]">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-[#555] sm:text-lg">
             Selecciona el acabado exacto de tus earplugs y pide ese mismo modelo
             directamente por WhatsApp. La experiencia mantiene el estilo actual
             de SafeSound y añade una capa de catálogo simple y premium.
           </p>
 
-          <div className="mt-10 rounded-[2rem] border border-[#DDD6D0] bg-white/90 p-6 shadow-sm backdrop-blur">
+          <div className="mt-8 rounded-[1.8rem] border border-[#DDD6D0] bg-white/90 p-5 shadow-sm backdrop-blur sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
@@ -576,41 +576,43 @@ export default function SafeSound() {
               />
             </div>
 
-            <div className="mt-6 rounded-[1.75rem] border border-[#EEE7E2] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F2_100%)] p-5">
+            <div className="mt-5 rounded-[1.5rem] border border-[#EEE7E2] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F2_100%)] p-4 sm:p-5">
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#7B2CFF]">
                 Acabado seleccionado
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
-                <h3 className="text-2xl font-black text-[#252525]">{selectedVariant.name}</h3>
+                <h3 className="text-xl font-black text-[#252525] sm:text-2xl">
+                  {selectedVariant.name}
+                </h3>
                 <span className="rounded-full bg-[#252525] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white">
                   {selectedVariant.reference}
                 </span>
               </div>
               <p className="mt-2 text-[#6F6A66]">{selectedVariant.finish}</p>
 
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {includedCards.map(({ icon: Icon, title, text }) => (
                   <div
                     key={title}
-                    className="rounded-[1.35rem] border border-[#E8E1DC] bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="rounded-[1.2rem] border border-[#E8E1DC] bg-white p-3.5 transition hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#7B2CFF]/8">
-                      <Icon className="text-[#7B2CFF]" size={22} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7B2CFF]/8">
+                      <Icon className="text-[#7B2CFF]" size={20} />
                     </div>
-                    <p className="mt-4 text-sm font-black text-[#252525]">{title}</p>
-                    <p className="mt-1 text-sm text-[#6F6A66]">{text}</p>
+                    <p className="mt-3 text-sm font-black text-[#252525]">{title}</p>
+                    <p className="mt-1 text-sm leading-snug text-[#6F6A66]">{text}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-3 text-sm text-[#555]">
-                <span className="rounded-full border border-[#E8E1DC] bg-white px-4 py-2">
+              <div className="mt-5 flex flex-wrap gap-2.5 text-sm text-[#555]">
+                <span className="rounded-full border border-[#E8E1DC] bg-white px-3.5 py-2">
                   Reducción de ruido {VOID_NOISE_REDUCTION}
                 </span>
-                <span className="rounded-full border border-[#E8E1DC] bg-white px-4 py-2">
+                <span className="rounded-full border border-[#E8E1DC] bg-white px-3.5 py-2">
                   Reutilizables y lavables
                 </span>
-                <span className="rounded-full border border-[#E8E1DC] bg-white px-4 py-2">
+                <span className="rounded-full border border-[#E8E1DC] bg-white px-3.5 py-2">
                   Silicona médica hipoalergénica
                 </span>
               </div>
@@ -618,7 +620,7 @@ export default function SafeSound() {
               <button
                 type="button"
                 onClick={handleOpenWhatsApp}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(123,44,255,0.2)] sm:w-auto"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#7B2CFF] px-7 py-3.5 font-black text-white transition hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(123,44,255,0.2)] sm:w-auto"
               >
                 <MessageCircle size={20} />
                 Pedir por WhatsApp
