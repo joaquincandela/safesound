@@ -18,6 +18,7 @@ import {
   Cross,
 } from "lucide-react";
 import PurchaseModal from "../components/PurchaseModal";
+import ChatWidget from "../components/ChatWidget";
 
 const wa = "https://wa.me/51968255972";
 const instagram =
@@ -756,14 +757,7 @@ export default function SafeSound() {
         © 2026 SafeSound - Mute the Noise
       </footer>
 
-      <button
-        type="button"
-        onClick={() => setModal({ variant: "compra" })}
-        aria-label="Comprar por WhatsApp"
-        className="fixed bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_35px_rgba(183,255,0,0.75)] transition hover:scale-110"
-      >
-        <MessageCircle size={30} />
-      </button>
+      <ChatWidget />
 
       <PurchaseModal
         open={modal !== null}
