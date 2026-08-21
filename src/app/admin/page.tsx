@@ -473,7 +473,7 @@ export default function AdminPage() {
                     }}
                     placeholder="Responder como SafeSound..."
                     maxLength={1000}
-                    className="w-full rounded-full border border-[#DDD6D0] bg-white px-5 py-3 text-sm text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
+                    className="w-full min-w-0 flex-1 rounded-full border border-[#DDD6D0] bg-white px-5 py-3 text-base text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
                   />
                   <button
                     type="button"

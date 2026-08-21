@@ -62,6 +62,15 @@ export default function ChatWidget({
     setName(window.localStorage.getItem(VISITOR_NAME_KEY) ?? "");
   }, []);
 
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
   const fetchMessages = useCallback(async () => {
     const visitorId = visitorIdRef.current || getVisitorId();
     if (!visitorId) return;
@@ -170,7 +179,7 @@ export default function ChatWidget({
   return (
     <>
       {open ? (
-        <div className="fixed bottom-6 right-6 z-[60] flex h-[34rem] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-[2rem] border border-[#DDD6D0] bg-white shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
+        <div className="fixed inset-x-0 bottom-0 z-[60] flex h-[88dvh] touch-manipulation flex-col overflow-hidden rounded-t-[1.5rem] border border-b-0 border-[#DDD6D0] bg-white shadow-[0_-12px_60px_rgba(0,0,0,0.28)] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[34rem] sm:max-w-[calc(100vw-3rem)] sm:rounded-[2rem] sm:border sm:border-b sm:shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
           <div className="flex items-center justify-between bg-[#252525] px-5 py-4">
             <div>
               <p className="font-black text-white">SafeSound</p>
@@ -183,9 +192,9 @@ export default function ChatWidget({
               type="button"
               aria-label="Cerrar chat"
               onClick={() => setOpen(false)}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition active:bg-white/20 hover:bg-white/10 hover:text-white"
             >
-              <X size={20} />
+              <X size={22} />
             </button>
           </div>
 
@@ -208,7 +217,7 @@ export default function ChatWidget({
             </div>
 
             {selectorOpen ? (
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="mt-3 grid max-h-[38dvh] gap-2 overflow-y-auto overscroll-contain pb-1 sm:max-h-none sm:grid-cols-2">
                 {variants.map((variant) => {
                   const isSelected = variant.id === selectedVariant.id;
                   return (
@@ -252,7 +261,7 @@ export default function ChatWidget({
             ) : null}
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto bg-[#F4F1EF] px-4 py-4">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#F4F1EF] px-4 py-4">
             {messages.length === 0 ? (
               <div className="mt-8 text-center text-sm text-[#666]">
                 Escríbenos y te respondemos lo antes posible.
@@ -287,7 +296,7 @@ export default function ChatWidget({
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-[#EEE7E2] bg-white px-4 py-3">
+          <div className="border-t border-[#EEE7E2] bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {sendError ? (
               <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
                 No se pudo enviar el mensaje. Revisa tu conexión e intenta de nuevo.
@@ -299,7 +308,7 @@ export default function ChatWidget({
               onChange={(event) => handleNameChange(event.target.value)}
               placeholder="Tu nombre (opcional)"
               maxLength={60}
-              className="mb-2 w-full rounded-full border border-[#DDD6D0] bg-white px-4 py-2 text-sm text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
+              className="mb-2 w-full rounded-full border border-[#DDD6D0] bg-white px-4 py-2.5 text-base text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
             />
             <div className="flex items-center gap-2">
               <input
@@ -311,7 +320,7 @@ export default function ChatWidget({
                 }}
                 placeholder="Escribe tu mensaje..."
                 maxLength={1000}
-                className="w-full rounded-full border border-[#DDD6D0] bg-white px-4 py-2.5 text-sm text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
+                className="w-full min-w-0 flex-1 rounded-full border border-[#DDD6D0] bg-white px-4 py-3 text-base text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
               />
               <button
                 type="button"
@@ -331,7 +340,7 @@ export default function ChatWidget({
         type="button"
         onClick={() => (open ? setOpen(false) : handleOpen())}
         aria-label="Abrir chat de SafeSound"
-        className="fixed bottom-6 right-6 z-[60] flex h-16 w-16 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_35px_rgba(183,255,0,0.75)] transition hover:scale-110"
+        className="fixed bottom-5 right-5 z-[60] flex h-16 w-16 touch-manipulation items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_35px_rgba(183,255,0,0.75)] transition active:scale-95 hover:scale-110 sm:bottom-6 sm:right-6"
       >
         <MessageCircle size={30} />
         {unreadCount > 0 ? (
