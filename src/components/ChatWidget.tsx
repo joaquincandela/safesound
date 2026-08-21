@@ -1,13 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, X } from "lucide-react";
+import { Check, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import type { VoidVariant } from "../lib/void-catalog";
 
 type ChatMessage = {
   id: string;
   sender: "visitor" | "admin";
   text: string;
   at: number;
+};
+
+type Props = {
+  selectedVariant: VoidVariant;
+  variants: VoidVariant[];
+  onSelectVariant: (variant: VoidVariant) => void;
 };
 
 const VISITOR_ID_KEY = "safesound_chat_visitor_id";
@@ -33,7 +40,11 @@ function formatTime(at: number): string {
   });
 }
 
-export default function ChatWidget() {
+export default function ChatWidget({
+  selectedVariant,
+  variants,
+  onSelectVariant,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -41,6 +52,7 @@ export default function ChatWidget() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [selectorOpen, setSelectorOpen] = useState(false);
 
   const visitorIdRef = useRef("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -107,39 +119,58 @@ export default function ChatWidget() {
     window.localStorage.setItem(VISITOR_NAME_KEY, value);
   };
 
-  const handleSend = async () => {
-    const text = draft.trim();
-    if (!text || sending) return;
+  const sendVisitorMessage = useCallback(
+    async (text: string) => {
+      const cleanText = text.trim();
+      if (!cleanText || sending) return false;
 
-    const visitorId = visitorIdRef.current || getVisitorId();
-    setSending(true);
-    setSendError(false);
+      const visitorId = visitorIdRef.current || getVisitorId();
+      setSending(true);
+      setSendError(false);
 
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visitorId, name, text }),
-      });
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visitorId, name, text: cleanText }),
+        });
 
-      if (response.ok) {
+        if (!response.ok) {
+          setSendError(true);
+          return false;
+        }
+
         const data = (await response.json()) as { messages: ChatMessage[] };
         setMessages(data.messages);
-        setDraft("");
-      } else {
+        return true;
+      } catch {
         setSendError(true);
+        return false;
+      } finally {
+        setSending(false);
       }
-    } catch {
-      setSendError(true);
-    } finally {
-      setSending(false);
+    },
+    [name, sending]
+  );
+
+  const handleSend = async () => {
+    const ok = await sendVisitorMessage(draft);
+    if (ok) setDraft("");
+  };
+
+  const handleSelectModel = async (variant: VoidVariant) => {
+    onSelectVariant(variant);
+    const ok = await sendVisitorMessage(`Quiero información sobre: ${variant.name}`);
+    if (ok) {
+      setSelectorOpen(false);
+      setDraft("");
     }
   };
 
   return (
     <>
       {open ? (
-        <div className="fixed bottom-6 right-6 z-[60] flex h-[28rem] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-[2rem] border border-[#DDD6D0] bg-white shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
+        <div className="fixed bottom-6 right-6 z-[60] flex h-[34rem] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-[2rem] border border-[#DDD6D0] bg-white shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
           <div className="flex items-center justify-between bg-[#252525] px-5 py-4">
             <div>
               <p className="font-black text-white">SafeSound</p>
@@ -158,10 +189,73 @@ export default function ChatWidget() {
             </button>
           </div>
 
+          <div className="border-b border-[#EEE7E2] bg-white px-4 py-3">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectorOpen((current) => !current)}
+                className="inline-flex items-center gap-2 rounded-full border border-[#DDD6D0] bg-[#F8F5F2] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#252525] transition hover:border-[#7B2CFF] hover:text-[#7B2CFF]"
+              >
+                <Sparkles size={14} />
+                Elegir modelo
+              </button>
+              <div className="min-w-0 rounded-full bg-[#7B2CFF]/8 px-3 py-2 text-xs text-[#7B2CFF]">
+                <span className="block truncate font-black">{selectedVariant.shortName}</span>
+                <span className="block truncate text-[11px] text-[#6F6A66]">
+                  {selectedVariant.finish}
+                </span>
+              </div>
+            </div>
+
+            {selectorOpen ? (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {variants.map((variant) => {
+                  const isSelected = variant.id === selectedVariant.id;
+                  return (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      onClick={() => handleSelectModel(variant)}
+                      disabled={sending}
+                      className={`rounded-2xl border px-3 py-3 text-left transition ${
+                        isSelected
+                          ? "border-[#7B2CFF] bg-[#7B2CFF]/8"
+                          : "border-[#E8E1DC] bg-white hover:border-[#7B2CFF]/35 hover:bg-[#7B2CFF]/5"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          {variant.swatches.map((swatch) => (
+                            <span
+                              key={`${variant.id}-${swatch}`}
+                              className="h-3.5 w-3.5 rounded-full border border-black/10"
+                              style={{ backgroundColor: swatch }}
+                            />
+                          ))}
+                        </div>
+                        <span
+                          className={`flex h-5 w-5 items-center justify-center rounded-full ${
+                            isSelected ? "bg-[#7B2CFF] text-white" : "bg-[#F4F1EF] text-[#AAA]"
+                          }`}
+                        >
+                          <Check size={12} />
+                        </span>
+                      </div>
+                      <p className="mt-3 text-xs font-black text-[#252525]">
+                        {variant.shortName}
+                      </p>
+                      <p className="mt-1 text-[11px] text-[#6F6A66]">{variant.finish}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+
           <div className="flex-1 space-y-3 overflow-y-auto bg-[#F4F1EF] px-4 py-4">
             {messages.length === 0 ? (
               <div className="mt-8 text-center text-sm text-[#666]">
-                ¡Hola! 👋 Escríbenos y te respondemos lo antes posible.
+                Escríbenos y te respondemos lo antes posible.
               </div>
             ) : null}
 
@@ -182,9 +276,7 @@ export default function ChatWidget() {
                   <p>{message.text}</p>
                   <p
                     className={`mt-1 text-right text-[10px] ${
-                      message.sender === "visitor"
-                        ? "text-white/60"
-                        : "text-[#999]"
+                      message.sender === "visitor" ? "text-white/60" : "text-[#999]"
                     }`}
                   >
                     {formatTime(message.at)}
@@ -198,8 +290,7 @@ export default function ChatWidget() {
           <div className="border-t border-[#EEE7E2] bg-white px-4 py-3">
             {sendError ? (
               <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
-                No se pudo enviar el mensaje. Revisa tu conexión e intenta de
-                nuevo.
+                No se pudo enviar el mensaje. Revisa tu conexión e intenta de nuevo.
               </p>
             ) : null}
             <input

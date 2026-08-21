@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import type { VoidVariant } from "../lib/void-catalog";
+import {
+  buildVoidWhatsAppMessage,
+  VOID_PRICE_LABEL,
+  VOID_PRODUCT_NAME,
+} from "../lib/void-catalog";
 
 const waNumber = "51968255972";
 
@@ -25,6 +31,7 @@ type Props = {
   onClose: () => void;
   variant?: Variant;
   product?: string;
+  selectedVoidVariant?: VoidVariant;
 };
 
 type FormErrors = {
@@ -39,10 +46,10 @@ export default function PurchaseModal({
   open,
   onClose,
   variant = "compra",
-  product = "Void",
+  product = VOID_PRODUCT_NAME,
+  selectedVoidVariant,
 }: Props) {
   const [nombre, setNombre] = useState("");
-
   const [cantidad, setCantidad] = useState(1);
   const [distrito, setDistrito] = useState("");
   const [empresa, setEmpresa] = useState("");
@@ -55,67 +62,57 @@ export default function PurchaseModal({
   const toggleOption = (option: string) => {
     setOpciones((current) =>
       current.includes(option)
-        ? current.filter((o) => o !== option)
+        ? current.filter((item) => item !== option)
         : [...current, option]
     );
   };
 
   const validate = (): boolean => {
-    const e: FormErrors = {};
-    if (!nombre.trim()) e.nombre = "Ingresa tu nombre";
+    const nextErrors: FormErrors = {};
+
+    if (!nombre.trim()) nextErrors.nombre = "Ingresa tu nombre";
+
     if (variant === "compra") {
-      if (!cantidad || cantidad < 1) e.cantidad = "Mínimo 1";
-      if (!distrito.trim()) e.distrito = "Ingresa tu distrito o provincia";
+      if (!cantidad || cantidad < 1) nextErrors.cantidad = "Mínimo 1";
+      if (!distrito.trim()) {
+        nextErrors.distrito = "Ingresa tu distrito o provincia";
+      }
     } else if (variant === "empresa") {
-      if (!empresa.trim()) e.empresa = "Ingresa el nombre de tu empresa";
-      if (!distrito.trim()) e.distrito = "Ingresa tu distrito o provincia";
-    } else {
-      if (opciones.length === 0) e.opciones = "Selecciona al menos una opción";
+      if (!empresa.trim()) nextErrors.empresa = "Ingresa el nombre de tu empresa";
+      if (!distrito.trim()) {
+        nextErrors.distrito = "Ingresa tu distrito o provincia";
+      }
+    } else if (opciones.length === 0) {
+      nextErrors.opciones = "Selecciona al menos una opción";
     }
-    setErrors(e);
-    return Object.keys(e).length === 0;
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (!validate()) return;
 
-    const lines: string[] = [
-      "Hola SafeSound 👋",
-      "",
-      "Quiero comprar:",
-      "",
-      "Producto:",
-      product,
-    ];
+    const lines =
+      variant === "compra" && selectedVoidVariant
+        ? buildVoidWhatsAppMessage(selectedVoidVariant).split("\n")
+        : ["Hola SafeSound", "", "Quiero comprar:", "", `Producto: ${product}`];
 
     if (variant === "compra") {
-      lines.push(
-        "",
-        "Cantidad:",
-        String(cantidad),
-        "",
-        "Distrito:",
-        distrito.trim()
-      );
+      lines.push("", `Cantidad: ${cantidad}`, `Distrito: ${distrito.trim()}`);
     } else if (variant === "empresa") {
-      lines.push(
-        "",
-        "Empresa:",
-        empresa.trim(),
-        "",
-        "Distrito:",
-        distrito.trim()
-      );
+      lines.push("", `Empresa: ${empresa.trim()}`, `Distrito: ${distrito.trim()}`);
     } else {
       lines.push("", "Para qué los quieres:");
-      opciones.forEach((o) => lines.push(o));
+      opciones.forEach((option) => lines.push(`- ${option}`));
     }
 
-    lines.push(
-      "",
-      `Mi nombre es ${nombre.trim()}.`
-    );
+    if (variant === "compra" && selectedVoidVariant) {
+      lines.push(`Mi nombre es ${nombre.trim()}.`);
+    } else {
+      lines.push("", `Mi nombre es ${nombre.trim()}.`);
+    }
 
     if (ayuda.trim()) {
       lines.push(
@@ -127,9 +124,11 @@ export default function PurchaseModal({
       );
     }
 
-    const msg = lines.join("\n");
-    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
+    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(
+      lines.join("\n")
+    )}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
     onClose();
   };
 
@@ -141,23 +140,25 @@ export default function PurchaseModal({
       ? "Cotizar para empresas"
       : variant === "healthy"
         ? "Healthy Sound"
-        : `Comprar ${product}`;
+        : `Comprar ${selectedVoidVariant?.name ?? product}`;
 
   const subtitle =
     variant === "empresa"
       ? "Completa tus datos y coordinamos una propuesta para tu empresa."
       : variant === "healthy"
         ? "Cuéntanos para qué los quieres y te asesoramos."
-        : "Completa tus datos y te redirigimos a WhatsApp.";
+        : selectedVoidVariant
+          ? `Modelo seleccionado: ${selectedVoidVariant.finish} · ${VOID_PRICE_LABEL}`
+          : "Completa tus datos y te redirigimos a WhatsApp.";
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-8 shadow-2xl">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-[#999] transition hover:bg-[#f0f0f0] hover:text-[#252525]"
           aria-label="Cerrar"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-[#999] transition hover:bg-[#f0f0f0] hover:text-[#252525]"
         >
           <X size={20} />
         </button>
@@ -166,7 +167,7 @@ export default function PurchaseModal({
         <p className="mt-1 text-sm text-[#888]">{subtitle}</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          {variant === "healthy" && (
+          {variant === "healthy" ? (
             <div>
               <label className="mb-2 block text-sm font-bold text-[#252525]">
                 ¿Para qué los quieres?
@@ -187,11 +188,11 @@ export default function PurchaseModal({
                   </label>
                 ))}
               </div>
-              {errors.opciones && (
+              {errors.opciones ? (
                 <p className="mt-1 text-xs text-red-500">{errors.opciones}</p>
-              )}
+              ) : null}
             </div>
-          )}
+          ) : null}
 
           <div>
             <label htmlFor="nombre" className="mb-1 block text-sm font-bold text-[#252525]">
@@ -201,11 +202,13 @@ export default function PurchaseModal({
               id="nombre"
               type="text"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(event) => setNombre(event.target.value)}
               placeholder="Tu nombre"
               className={inputBase}
             />
-            {errors.nombre && <p className="mt-1 text-xs text-red-500">{errors.nombre}</p>}
+            {errors.nombre ? (
+              <p className="mt-1 text-xs text-red-500">{errors.nombre}</p>
+            ) : null}
           </div>
 
           <div>
@@ -215,13 +218,28 @@ export default function PurchaseModal({
             <input
               id="producto"
               type="text"
-              value={product}
+              value={product || VOID_PRODUCT_NAME}
               readOnly
               className={`${inputBase} cursor-not-allowed bg-[#f5f5f5] text-[#666]`}
             />
           </div>
 
-          {variant === "compra" && (
+          {variant === "compra" && selectedVoidVariant ? (
+            <div>
+              <label htmlFor="modelo" className="mb-1 block text-sm font-bold text-[#252525]">
+                Modelo seleccionado
+              </label>
+              <input
+                id="modelo"
+                type="text"
+                value={`${selectedVoidVariant.name} · ${selectedVoidVariant.reference}`}
+                readOnly
+                className={`${inputBase} cursor-not-allowed bg-[#f5f5f5] text-[#666]`}
+              />
+            </div>
+          ) : null}
+
+          {variant === "compra" ? (
             <div>
               <label htmlFor="cantidad" className="mb-1 block text-sm font-bold text-[#252525]">
                 Cantidad <span className="font-normal text-[#888]">(valor inicial: 1)</span>
@@ -231,14 +249,16 @@ export default function PurchaseModal({
                 type="number"
                 min={1}
                 value={cantidad}
-                onChange={(e) => setCantidad(Number(e.target.value))}
+                onChange={(event) => setCantidad(Number(event.target.value))}
                 className={inputBase}
               />
-              {errors.cantidad && <p className="mt-1 text-xs text-red-500">{errors.cantidad}</p>}
+              {errors.cantidad ? (
+                <p className="mt-1 text-xs text-red-500">{errors.cantidad}</p>
+              ) : null}
             </div>
-          )}
+          ) : null}
 
-          {variant === "empresa" && (
+          {variant === "empresa" ? (
             <div>
               <label htmlFor="empresa" className="mb-1 block text-sm font-bold text-[#252525]">
                 Empresa
@@ -247,15 +267,17 @@ export default function PurchaseModal({
                 id="empresa"
                 type="text"
                 value={empresa}
-                onChange={(e) => setEmpresa(e.target.value)}
+                onChange={(event) => setEmpresa(event.target.value)}
                 placeholder="Nombre de tu empresa"
                 className={inputBase}
               />
-              {errors.empresa && <p className="mt-1 text-xs text-red-500">{errors.empresa}</p>}
+              {errors.empresa ? (
+                <p className="mt-1 text-xs text-red-500">{errors.empresa}</p>
+              ) : null}
             </div>
-          )}
+          ) : null}
 
-          {variant !== "healthy" && (
+          {variant !== "healthy" ? (
             <div>
               <label htmlFor="distrito" className="mb-1 block text-sm font-bold text-[#252525]">
                 Distrito / Provincia
@@ -264,15 +286,17 @@ export default function PurchaseModal({
                 id="distrito"
                 type="text"
                 value={distrito}
-                onChange={(e) => setDistrito(e.target.value)}
+                onChange={(event) => setDistrito(event.target.value)}
                 placeholder="Ej: Miraflores"
                 className={inputBase}
               />
-              {errors.distrito && <p className="mt-1 text-xs text-red-500">{errors.distrito}</p>}
+              {errors.distrito ? (
+                <p className="mt-1 text-xs text-red-500">{errors.distrito}</p>
+              ) : null}
             </div>
-          )}
+          ) : null}
 
-          {variant !== "compra" && (
+          {variant !== "compra" ? (
             <div>
               <label htmlFor="ayuda" className="mb-1 block text-sm font-bold text-[#252525]">
                 {variant === "empresa"
@@ -284,7 +308,7 @@ export default function PurchaseModal({
                 id="ayuda"
                 rows={3}
                 value={ayuda}
-                onChange={(e) => setAyuda(e.target.value)}
+                onChange={(event) => setAyuda(event.target.value)}
                 placeholder={
                   variant === "empresa"
                     ? "Ej: 20 pares para nuestra oficina"
@@ -293,7 +317,7 @@ export default function PurchaseModal({
                 className={`${inputBase} resize-none`}
               />
             </div>
-          )}
+          ) : null}
 
           <button
             type="submit"

@@ -88,7 +88,6 @@ export async function pingStorage(): Promise<{
 
 const CONV_KEY_PREFIX = "safesound:chat:conv:";
 const INDEX_KEY = "safesound:chat:index";
-const CONV_TTL_SECONDS = 90 * 24 * 60 * 60;
 
 async function redisCommand<T>(command: unknown[]): Promise<T> {
   const response = await fetch(REDIS_URL!, {
@@ -138,9 +137,9 @@ end
 if ARGV[2] ~= '' then conv.name = ARGV[2] end
 table.insert(conv.messages, cjson.decode(ARGV[1]))
 conv.updatedAt = tonumber(ARGV[3])
+redis.call('PERSIST', KEYS[1])
 redis.call('SET', KEYS[1], cjson.encode(conv))
 redis.call('SADD', KEYS[2], ARGV[4])
-redis.call('EXPIRE', KEYS[1], tonumber(ARGV[5]))
 return 1
 `;
 
@@ -195,8 +194,6 @@ return 1`,
     "SET",
     CONV_KEY_PREFIX + visitorId,
     JSON.stringify(conversation),
-    "EX",
-    String(CONV_TTL_SECONDS),
   ]);
   await redisCommand(["SADD", INDEX_KEY, visitorId]);
   return conversation;
@@ -227,10 +224,16 @@ async function redisAppendMessage(
     JSON.stringify(message),
     sender === "visitor" && name ? name : "",
     String(now),
-    String(CONV_TTL_SECONDS),
   ]);
 
   return redisGetOrCreateConversation(visitorId);
+}
+
+async function redisDeleteConversation(visitorId: string): Promise<void> {
+  await redisPipeline([
+    ["DEL", CONV_KEY_PREFIX + visitorId],
+    ["SREM", INDEX_KEY, visitorId],
+  ]);
 }
 
 async function redisMarkThreadRead(
@@ -404,6 +407,13 @@ async function fileMarkThreadRead(
   if (changed) await fileWriteDb(conversations);
 }
 
+async function fileDeleteConversation(visitorId: string): Promise<void> {
+  const conversations = await fileReadDb();
+  if (!(visitorId in conversations)) return;
+  delete conversations[visitorId];
+  await fileWriteDb(conversations);
+}
+
 export async function getOrCreateConversation(
   visitorId: string,
   name?: string
@@ -432,6 +442,12 @@ export async function markThreadReadByAdmin(visitorId: string): Promise<void> {
   return USE_REDIS
     ? redisMarkThreadRead(visitorId, "visitor", "readByAdmin")
     : fileMarkThreadRead(visitorId, "visitor", "readByAdmin");
+}
+
+export async function deleteConversation(visitorId: string): Promise<void> {
+  return USE_REDIS
+    ? redisDeleteConversation(visitorId)
+    : fileDeleteConversation(visitorId);
 }
 
 export async function markThreadReadByVisitor(

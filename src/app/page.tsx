@@ -1,28 +1,44 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
+  Briefcase,
+  Building2,
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
-  Volume2,
-  Briefcase,
-  Moon,
-  Star,
-  Building2,
-  HeartPulse,
-  ShieldCheck,
-  Feather,
-  RefreshCw,
   Cross,
+  Feather,
+  HeartPulse,
+  MessageCircle,
+  Moon,
+  RefreshCw,
+  ShieldCheck,
+  Star,
+  Volume2,
 } from "lucide-react";
 import PurchaseModal from "../components/PurchaseModal";
 import ChatWidget from "../components/ChatWidget";
+import VoidCatalogGrid from "../components/VoidCatalogGrid";
+import VoidVariantSelector from "../components/VoidVariantSelector";
+import {
+  buildVoidWhatsAppMessage,
+  getVoidVariantById,
+  getVoidVariantImage,
+  VOID_FALLBACK_IMAGE,
+  VOID_NOISE_REDUCTION,
+  VOID_PRICE_LABEL,
+  VOID_PRICE_VALUE,
+  VOID_PRODUCT_NAME,
+  voidIncludedItems,
+  voidVariants,
+  type VoidVariant,
+} from "../lib/void-catalog";
 
-const wa = "https://wa.me/51968255972";
+const waNumber = "51968255972";
 const instagram =
   "https://www.instagram.com/safesound.pe?igsh=MTFtMnI2ZXNwdms5Zg%3D%3D&utm_source=qr";
+const selectedVariantStorageKey = "safesound_void_selected_variant";
 
 const sectionImageClass =
   "relative z-10 w-full rounded-[2rem] border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)]";
@@ -38,11 +54,13 @@ const benefitCards = [
     icon: Briefcase,
     title: "Trabajo & estudio",
     text: "Más enfoque y menos distracciones en tu día.",
+    backgroundImage: "/images/work.ear.png",
   },
   {
     icon: Moon,
     title: "Sueño & viajes",
     text: "Descansa mejor y viaja con tranquilidad.",
+    backgroundImage: "/images/sleep.ear.png",
   },
 ];
 
@@ -75,18 +93,26 @@ const reviews = [
   },
 ];
 
-const includedItems = [
+const includedCards = [
   {
     icon: ShieldCheck,
-    title: "Earplugs premium",
+    title: "Earplugs VOID",
+    text: "Protección auditiva premium",
   },
   {
     icon: Cross,
     title: "Estuche portátil",
+    text: "Listos para llevar contigo",
   },
   {
     icon: RefreshCw,
-    title: "Tallas de repuesto",
+    title: "2 pares extra",
+    text: "Tallas de repuesto incluidas",
+  },
+  {
+    icon: Feather,
+    title: "Silicona médica",
+    text: "Hipoalergénica y lavable",
   },
 ];
 
@@ -96,65 +122,87 @@ type ProductSlide = {
   src: string;
 };
 
-const productSlides: ProductSlide[] = [
-  
-  {
-    src: "/images/product-lifestyle.png",
-    alt: "Producto SafeSound en una composición lifestyle",
-    caption: "Lifestyle premium",
-  },
-  {
-    src: "/images/negrocondorado.png",
-    alt: "Color 1",
-    caption: "Color 1",
-  },
-  {
-    src: "/images/moradoconblanco.png",
-    alt: "Color 2",
-    caption: "Color 2",
-  },
-  {
-    src: "/images/plateadoconnegro.png",
-    alt: "Color 3",
-    caption: "Color 3",
-  },
-  {
-    src: "/images/plateadoconblanco.png",
-    alt: "Color 4",
-    caption: "Color 4",
-  },
-  {
-    src: "/images/transparentes.png",
-    alt: "Color 5",
-    caption: "Color 5",
-  },
-  {
-    src: "/images/trasnparenteconnegro.png",
-    alt: "Color 6",
-    caption: "Color 6",
-  },
-  {
-    src: "/images/rosadoconblanco.png",
-    alt: "Color 7",
-    caption: "Color 7",
-  },
-  {
-    src: "/images/doradoconamarillo.png",
-    alt: "Color 8",
-    caption: "Color 8",
-  },
-];
-
 export default function SafeSound() {
+  const [selectedVariant, setSelectedVariant] = useState<VoidVariant>(voidVariants[0]);
   const [activeProductSlide, setActiveProductSlide] = useState(0);
-  const [brokenSlides, setBrokenSlides] = useState<Record<string, boolean>>({});
+  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const [modal, setModal] = useState<{
     variant: "compra" | "empresa" | "healthy";
     product?: string;
   } | null>(null);
 
-  const currentProductSlide = productSlides[activeProductSlide];
-  const isCurrentSlideBroken = Boolean(brokenSlides[currentProductSlide.src]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [renderDragOffset, setRenderDragOffset] = useState(0);
+
+  const dragStartX = useRef(0);
+  const dragOffsetRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  const purchaseSectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedId = window.localStorage.getItem(selectedVariantStorageKey);
+    if (storedId) {
+      setSelectedVariant(getVoidVariantById(storedId));
+    }
+  }, []);
+
+  const productSlides: ProductSlide[] = [
+    {
+      src: brokenImages[selectedVariant.imageSrc]
+        ? VOID_FALLBACK_IMAGE
+        : getVoidVariantImage(selectedVariant),
+      alt: selectedVariant.name,
+      caption: selectedVariant.shortName,
+    },
+    {
+      src: "/images/product-lifestyle.png",
+      alt: "Producto SafeSound en una composición lifestyle",
+      caption: "Lifestyle premium",
+    },
+    ...voidVariants
+      .filter((variant) => variant.id !== selectedVariant.id)
+      .map((variant) => ({
+        src: brokenImages[variant.imageSrc]
+          ? VOID_FALLBACK_IMAGE
+          : getVoidVariantImage(variant),
+        alt: variant.name,
+        caption: variant.shortName,
+      })),
+  ];
+
+  const currentProductSlide = productSlides[activeProductSlide] ?? productSlides[0];
+
+  const persistVariant = (variant: VoidVariant) => {
+    setSelectedVariant(variant);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(selectedVariantStorageKey, variant.id);
+    }
+  };
+
+  const scrollToPurchaseSection = () => {
+    purchaseSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  const handleVariantSelect = (variant: VoidVariant, shouldScroll = false) => {
+    persistVariant(variant);
+    setActiveProductSlide(0);
+    if (shouldScroll) {
+      requestAnimationFrame(scrollToPurchaseSection);
+    }
+  };
+
+  const handleOpenWhatsApp = () => {
+    const message = buildVoidWhatsAppMessage(selectedVariant);
+    window.open(
+      `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   const goToPreviousSlide = () => {
     setActiveProductSlide((current) =>
@@ -168,24 +216,22 @@ export default function SafeSound() {
     );
   };
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [renderDragOffset, setRenderDragOffset] = useState(0);
-  const dragStartX = useRef(0);
-  const dragOffsetRef = useRef(0);
-  const isDraggingRef = useRef(false);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    isDraggingRef.current = true;
-    setIsDragging(true);
-    dragStartX.current = e.clientX;
-    dragOffsetRef.current = 0;
-    setRenderDragOffset(0);
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  const handleBrokenImage = (src: string) => {
+    setBrokenImages((current) => ({ ...current, [src]: true }));
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    dragStartX.current = event.clientX;
+    dragOffsetRef.current = 0;
+    setRenderDragOffset(0);
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent) => {
     if (!isDraggingRef.current) return;
-    const diff = e.clientX - dragStartX.current;
+    const diff = event.clientX - dragStartX.current;
     dragOffsetRef.current = diff;
     setRenderDragOffset(diff);
   };
@@ -197,10 +243,10 @@ export default function SafeSound() {
     setIsDragging(false);
     dragOffsetRef.current = 0;
     setRenderDragOffset(0);
-    const threshold = 80;
-    if (offset < -threshold) {
+
+    if (offset < -80) {
       goToNextSlide();
-    } else if (offset > threshold) {
+    } else if (offset > 80) {
       goToPreviousSlide();
     }
   };
@@ -222,6 +268,9 @@ export default function SafeSound() {
             <a href="#mute" className="transition hover:text-[#7B2CFF]">
               VOID
             </a>
+            <a href="#catalogo" className="transition hover:text-[#7B2CFF]">
+              Catálogo
+            </a>
             <a href="#empresas" className="transition hover:text-[#7B2CFF]">
               Empresas
             </a>
@@ -233,7 +282,7 @@ export default function SafeSound() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setModal({ variant: "compra" })}
+              onClick={() => setModal({ variant: "compra", product: VOID_PRODUCT_NAME })}
               aria-label="WhatsApp SafeSound"
               className="flex h-12 w-12 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_25px_rgba(183,255,0,0.45)] transition hover:scale-105"
             >
@@ -284,7 +333,7 @@ export default function SafeSound() {
             Protección auditiva premium
           </div>
 
-          <h1 className="mt-6 text-7xl font-black tracking-tight leading-none text-[#252525] md:text-8xl lg:text-9xl">
+          <h1 className="mt-6 text-7xl font-black leading-none tracking-tight text-[#252525] md:text-8xl lg:text-9xl">
             V O I D
           </h1>
 
@@ -292,16 +341,16 @@ export default function SafeSound() {
 
           <p className="mt-6 max-w-xl text-xl leading-relaxed text-[#555]">
             Earplugs premium diseñados para reducir el ruido sin aislarte.
-            Diseñados para conciertos, trabajo, estudio, viajes y descanso.
+            Pensados para conciertos, trabajo, estudio, viajes y descanso.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <button
               type="button"
-              onClick={() => setModal({ variant: "compra" })}
+              onClick={scrollToPurchaseSection}
               className="rounded-full bg-[#B7FF00] px-8 py-4 font-black text-black transition hover:scale-105"
             >
-              Comprar
+              Elegir acabado
             </button>
             <a
               href="#benefits"
@@ -315,12 +364,12 @@ export default function SafeSound() {
             <div className="text-center">
               <Volume2 className="mx-auto text-[#7B2CFF]" size={30} />
               <p className="mt-3 font-black">Reduce ruido</p>
-              <span className="text-sm text-[#666]">hasta 23dB</span>
+              <span className="text-sm text-[#666]">hasta 23 dB</span>
             </div>
             <div className="text-center">
               <ShieldCheck className="mx-auto text-[#7B2CFF]" size={30} />
               <p className="mt-3 font-black">Protección</p>
-              <span className="text-sm text-[#666]">certificada</span>
+              <span className="text-sm text-[#666]">uso diario</span>
             </div>
             <div className="text-center">
               <Feather className="mx-auto text-[#7B2CFF]" size={30} />
@@ -334,7 +383,7 @@ export default function SafeSound() {
           <div className="absolute h-[500px] w-[500px] rounded-full bg-[#B7FF00]/25 blur-[120px]" />
           <Image
             src="/images/mute-hero-hd.png"
-            alt="Render premium de los earplugs Mute"
+            alt="Render premium de los earplugs VOID"
             width={1254}
             height={1254}
             priority
@@ -348,64 +397,30 @@ export default function SafeSound() {
         id="benefits"
         className="mx-auto grid max-w-7xl gap-6 px-6 py-10 md:grid-cols-3"
       >
-        {benefitCards.map(({ backgroundImage, icon: Icon, title, text }) => {
-          const cardBackgroundImage =
-            backgroundImage ??
-            (title === "Trabajo & estudio"
-              ? "/images/work.ear.png"
-              : title === "Sueño & viajes"
-                ? "/images/sleep.ear.png"
-                : undefined);
-
-          return (
+        {benefitCards.map(({ backgroundImage, icon: Icon, title, text }) => (
+          <div
+            key={title}
+            className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#252525] p-8 shadow-[0_18px_50px_rgba(0,0,0,0.22)] transition duration-500 hover:-translate-y-1 hover:shadow-xl"
+          >
             <div
-              key={title}
-              className={`group relative overflow-hidden rounded-[2rem] border p-8 transition duration-500 hover:-translate-y-1 hover:shadow-xl ${
-                cardBackgroundImage
-                  ? "border-white/10 bg-[#252525] shadow-[0_18px_50px_rgba(0,0,0,0.22)]"
-                  : "border-[#DDD6D0] bg-white shadow-sm"
-              }`}
-            >
-              {cardBackgroundImage ? (
-                <>
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
-                    style={{ backgroundImage: `url('${cardBackgroundImage}')` }}
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.14)_0%,rgba(8,8,8,0.34)_38%,rgba(8,8,8,0.72)_100%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
-                  <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
-                </>
-              ) : null}
+              className="absolute inset-0 bg-cover bg-center transition duration-700 ease-out group-hover:scale-105"
+              style={{ backgroundImage: `url('${backgroundImage}')` }}
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.14)_0%,rgba(8,8,8,0.34)_38%,rgba(8,8,8,0.72)_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
+            <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
 
-              <div
-                className={`relative z-10 ${
-                  cardBackgroundImage ? "text-[#B7FF00]" : "text-[#7B2CFF]"
-                }`}
-              >
-                <Icon />
-              </div>
-              <h3
-                className={`relative z-10 mt-5 text-2xl font-black ${
-                  cardBackgroundImage
-                    ? "max-w-[14rem] text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]"
-                    : "text-[#252525]"
-                }`}
-              >
-                {title}
-              </h3>
-              <p
-                className={`relative z-10 mt-3 leading-relaxed ${
-                  cardBackgroundImage
-                    ? "max-w-[16rem] text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.52)]"
-                    : "text-[#666]"
-                }`}
-              >
-                {text}
-              </p>
+            <div className="relative z-10 text-[#B7FF00]">
+              <Icon />
             </div>
-          );
-        })}
+            <h3 className="relative z-10 mt-5 max-w-[14rem] text-2xl font-black text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]">
+              {title}
+            </h3>
+            <p className="relative z-10 mt-3 max-w-[16rem] leading-relaxed text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.52)]">
+              {text}
+            </p>
+          </div>
+        ))}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16">
@@ -420,7 +435,10 @@ export default function SafeSound() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 lg:grid-cols-2">
+      <section
+        ref={purchaseSectionRef}
+        className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 lg:grid-cols-2"
+      >
         <div className="relative">
           <div className="absolute h-[400px] w-[400px] rounded-full bg-[#7B2CFF]/20 blur-[100px]" />
           <div
@@ -431,11 +449,11 @@ export default function SafeSound() {
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowLeft") goToPreviousSlide();
-              if (e.key === "ArrowRight") goToNextSlide();
+            onKeyDown={(event) => {
+              if (event.key === "ArrowLeft") goToPreviousSlide();
+              if (event.key === "ArrowRight") goToNextSlide();
             }}
-            className="relative overflow-hidden rounded-[2rem] outline-none cursor-grab active:cursor-grabbing select-none touch-pan-y"
+            className="relative overflow-hidden rounded-[2rem] outline-none"
           >
             <div className="relative min-h-[22rem] sm:min-h-[28rem]">
               <div className="absolute left-5 top-5 z-20 rounded-full border border-white/15 bg-[#252525]/78 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-white/85 backdrop-blur">
@@ -445,63 +463,37 @@ export default function SafeSound() {
               <div
                 className={`flex w-full ${isDragging ? "" : "transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"}`}
                 style={{
-                  transform: `translateX(calc(-${activeProductSlide * 100}% + ${isDragging ? renderDragOffset : 0}px))`,
+                  transform: `translateX(calc(-${activeProductSlide * 100}% + ${
+                    isDragging ? renderDragOffset : 0
+                  }px))`,
                   willChange: "transform",
                 }}
               >
-                {productSlides.map((slide) => {
-                  const slideBroken = Boolean(brokenSlides[slide.src]);
-                  return (
-                    <div
-                      key={slide.src}
-                      className="relative w-full shrink-0 basis-full"
-                    >
-                      {slideBroken ? (
-                        <div className="relative z-10 flex aspect-square w-full items-end rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,#7B2CFF33,transparent_35%),linear-gradient(160deg,#252525_0%,#1C1C1C_60%,#101010_100%)] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
-                          <div>
-                            <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#B7FF00]">
-                              Visual pendiente
-                            </p>
-                            <h3 className="mt-4 text-3xl font-black tracking-tight text-white">
-                              {slide.alt}
-                            </h3>
-                            <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/72">
-                              Agrega &quot;{slide.src}&quot; para mostrar esta
-                              vista.
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <Image
-                          src={slide.src}
-                          alt={slide.alt}
-                          width={1254}
-                          height={1254}
-                          quality={100}
-                          draggable={false}
-                          sizes="(min-width: 1024px) 38rem, 100vw"
-                          onError={() =>
-                            setBrokenSlides((current) => ({
-                              ...current,
-                              [slide.src]: true,
-                            }))
-                          }
-                          className="relative z-10 aspect-square w-full rounded-[2rem] object-cover border border-white/10 shadow-[0_28px_80px_rgba(0,0,0,0.32)]"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                {productSlides.map((slide) => (
+                  <div key={`${slide.caption}-${slide.src}`} className="relative w-full shrink-0 basis-full">
+                    <Image
+                      src={slide.src}
+                      alt={slide.alt}
+                      width={1254}
+                      height={1254}
+                      quality={100}
+                      draggable={false}
+                      sizes="(min-width: 1024px) 38rem, 100vw"
+                      onError={() => handleBrokenImage(slide.src)}
+                      className="relative z-10 aspect-square w-full rounded-[2rem] border border-white/10 object-cover shadow-[0_28px_80px_rgba(0,0,0,0.32)]"
+                    />
+                  </div>
+                ))}
               </div>
 
               <button
                 type="button"
                 aria-label="Imagen anterior"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={(event) => {
+                  event.stopPropagation();
                   goToPreviousSlide();
                 }}
-                onPointerDown={(e) => e.stopPropagation()}
+                onPointerDown={(event) => event.stopPropagation()}
                 className="absolute left-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)]"
               >
                 <ChevronLeft size={18} strokeWidth={2.5} />
@@ -510,11 +502,11 @@ export default function SafeSound() {
               <button
                 type="button"
                 aria-label="Siguiente imagen"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={(event) => {
+                  event.stopPropagation();
                   goToNextSlide();
                 }}
-                onPointerDown={(e) => e.stopPropagation()}
+                onPointerDown={(event) => event.stopPropagation()}
                 className="absolute right-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)]"
               >
                 <ChevronRight size={18} strokeWidth={2.5} />
@@ -526,7 +518,7 @@ export default function SafeSound() {
                 const isActive = index === activeProductSlide;
                 return (
                   <button
-                    key={slide.src}
+                    key={`${slide.caption}-dot`}
                     type="button"
                     aria-label={`Ver imagen ${index + 1}`}
                     aria-pressed={isActive}
@@ -547,76 +539,129 @@ export default function SafeSound() {
           <p className="font-bold uppercase tracking-widest text-[#7B2CFF]">
             Producto principal
           </p>
-          <h2 className="mt-5 text-6xl font-black">VOID</h2>
-          <p className="mt-6 text-lg leading-relaxed text-[#555]">
-            Incluye earplugs premium, estuche portátil y diseño pensado para
-            acompañarte todos los días. Protección auditiva moderna con estética
-            premium.
+          <div className="mt-5 flex flex-wrap items-end gap-4">
+            <h2 className="text-6xl font-black">{VOID_PRODUCT_NAME}</h2>
+            <p className="pb-2 text-3xl font-black text-[#252525]">{VOID_PRICE_LABEL}</p>
+          </div>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#555]">
+            Selecciona el acabado exacto de tus earplugs y pide ese mismo modelo
+            directamente por WhatsApp. La experiencia mantiene el estilo actual
+            de SafeSound y añade una capa de catálogo simple y premium.
           </p>
 
-          <div className="mt-10 space-y-5">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="text-[#B7FF00]" />
-              Protección auditiva cómoda
-            </div>
-            <div className="flex items-center gap-3">
-              <Volume2 className="text-[#B7FF00]" />
-              Sonido más claro y controlado
-            </div>
-            <div className="flex items-center gap-3">
-              <Feather className="text-[#B7FF00]" />
-              Diseño ligero y elegante
-            </div>
-          </div>
-
           <div className="mt-10 rounded-[2rem] border border-[#DDD6D0] bg-white/90 p-6 shadow-sm backdrop-blur">
-            <div className="grid gap-6 border-b border-[#EEE7E2] pb-6 md:grid-cols-[auto_1fr] md:items-end">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
-                  Desde
+                  Selecciona tu acabado
                 </p>
-                <p className="mt-2 text-4xl font-black tracking-tight text-[#252525] md:text-5xl">
-                  S/65
+                <p className="mt-2 text-sm text-[#6F6A66]">
+                  {voidVariants.length} modelos disponibles · Precio único {VOID_PRICE_VALUE}
                 </p>
               </div>
-
-              <div className="md:flex md:justify-end md:pb-1">
-                <button
-                  type="button"
-                  onClick={() => setModal({ variant: "compra" })}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
-                >
-                  <MessageCircle size={22} />
-                  Pedir por WhatsApp
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setModal({ variant: "compra", product: VOID_PRODUCT_NAME })}
+                className="hidden rounded-full border border-[#DDD6D0] px-5 py-3 text-sm font-black text-[#252525] transition hover:border-[#7B2CFF] hover:text-[#7B2CFF] md:inline-flex"
+              >
+                Comprar con datos
+              </button>
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              {includedItems.map(({ icon: Icon, title }) => (
-                <div
-                  key={title}
-                  className="rounded-[1.5rem] border border-[#E8E1DC] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F2_100%)] p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#7B2CFF]/8">
-                    <Icon className="text-[#7B2CFF]" size={22} />
+            <div className="mt-6">
+              <VoidVariantSelector
+                selectedId={selectedVariant.id}
+                variants={voidVariants}
+                onSelect={(variant) => handleVariantSelect(variant)}
+              />
+            </div>
+
+            <div className="mt-6 rounded-[1.75rem] border border-[#EEE7E2] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F2_100%)] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#7B2CFF]">
+                Acabado seleccionado
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <h3 className="text-2xl font-black text-[#252525]">{selectedVariant.name}</h3>
+                <span className="rounded-full bg-[#252525] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white">
+                  {selectedVariant.reference}
+                </span>
+              </div>
+              <p className="mt-2 text-[#6F6A66]">{selectedVariant.finish}</p>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {includedCards.map(({ icon: Icon, title, text }) => (
+                  <div
+                    key={title}
+                    className="rounded-[1.35rem] border border-[#E8E1DC] bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#7B2CFF]/8">
+                      <Icon className="text-[#7B2CFF]" size={22} />
+                    </div>
+                    <p className="mt-4 text-sm font-black text-[#252525]">{title}</p>
+                    <p className="mt-1 text-sm text-[#6F6A66]">{text}</p>
                   </div>
-                  <p className="mt-4 text-sm font-bold text-[#252525]">
-                    {title}
-                  </p>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3 text-sm text-[#555]">
+                <span className="rounded-full border border-[#E8E1DC] bg-white px-4 py-2">
+                  Reducción de ruido {VOID_NOISE_REDUCTION}
+                </span>
+                <span className="rounded-full border border-[#E8E1DC] bg-white px-4 py-2">
+                  Reutilizables y lavables
+                </span>
+                <span className="rounded-full border border-[#E8E1DC] bg-white px-4 py-2">
+                  Silicona médica hipoalergénica
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleOpenWhatsApp}
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(123,44,255,0.2)] sm:w-auto"
+              >
+                <MessageCircle size={20} />
+                Pedir por WhatsApp
+              </button>
             </div>
           </div>
+        </div>
+      </section>
 
+      <section id="catalogo" className="mx-auto max-w-7xl px-6 py-16">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
+              Catálogo VOID
+            </p>
+            <h2 className="mt-3 text-5xl font-black text-[#252525]">
+              8 acabados, una misma experiencia premium
+            </h2>
+            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#666]">
+              Elige tu modelo, actualiza la sección principal y pide exactamente
+              ese acabado por WhatsApp o desde el chat interno.
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-[#DDD6D0] bg-white px-5 py-4 text-sm text-[#555] shadow-sm">
+            Precio único: <span className="font-black text-[#252525]">{VOID_PRICE_VALUE}</span>
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <VoidCatalogGrid
+            selectedId={selectedVariant.id}
+            variants={voidVariants}
+            brokenImages={brokenImages}
+            onBrokenImage={handleBrokenImage}
+            onSelect={(variant) => handleVariantSelect(variant, true)}
+          />
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-20">
         <h2 className="text-center text-5xl font-black">Comentarios reales</h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-[#666]">
-          Opiniones auténticas de personas que ya usan SafeSound en su día a
-          día.
+          Opiniones auténticas de personas que ya usan SafeSound en su día a día.
         </p>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {reviews.map(({ age, context, name, quote }) => (
@@ -625,15 +670,11 @@ export default function SafeSound() {
               className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
               <div className="flex gap-1 text-[#B7FF00]">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <Star key={n} size={18} fill="currentColor" />
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <Star key={value} size={18} fill="currentColor" />
                 ))}
               </div>
-
-              <p className="mt-5 text-lg leading-relaxed text-[#444]">
-                “{quote}”
-              </p>
-
+              <p className="mt-5 text-lg leading-relaxed text-[#444]">“{quote}”</p>
               <div className="mt-8 border-t border-[#EEE7E2] pt-5">
                 <p className="font-black text-[#252525]">{name}</p>
                 <p className="mt-1 text-sm text-[#6F6A66]">
@@ -735,34 +776,39 @@ export default function SafeSound() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.16)_0%,rgba(18,18,18,0.42)_45%,rgba(18,18,18,0.82)_100%)]" />
         <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
 
-          <div className="relative z-20 mx-auto max-w-2xl">
-            <h2 className="text-5xl font-black text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.38)] md:text-6xl">
-              Vive tu momento.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.42)]">
-              Compra directa por WhatsApp. Atención rápida y personalizada.
-            </p>
-            <button
-              type="button"
-              onClick={() => setModal({ variant: "compra" })}
-              className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105 hover:bg-[#F8F4E8]"
-            >
-              <MessageCircle size={22} />
-              Comprar Mute
-            </button>
-          </div>
+        <div className="relative z-20 mx-auto max-w-2xl">
+          <h2 className="text-5xl font-black text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.38)] md:text-6xl">
+            Vive tu momento.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-[#F8F4E8] [text-shadow:0_2px_14px_rgba(0,0,0,0.42)]">
+            Compra directa por WhatsApp. Atención rápida y personalizada.
+          </p>
+          <button
+            type="button"
+            onClick={() => setModal({ variant: "compra", product: VOID_PRODUCT_NAME })}
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-black text-[#252525] transition hover:scale-105 hover:bg-[#F8F4E8]"
+          >
+            <MessageCircle size={22} />
+            Comprar VOID
+          </button>
+        </div>
       </section>
 
       <footer className="py-12 text-center text-[#777]">
         © 2026 SafeSound - Mute the Noise
       </footer>
 
-      <ChatWidget />
+      <ChatWidget
+        selectedVariant={selectedVariant}
+        variants={voidVariants}
+        onSelectVariant={(variant) => handleVariantSelect(variant)}
+      />
 
       <PurchaseModal
         open={modal !== null}
         variant={modal?.variant}
         product={modal?.product}
+        selectedVoidVariant={selectedVariant}
         onClose={() => setModal(null)}
       />
     </main>

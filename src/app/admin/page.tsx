@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { LogOut, RefreshCw, Send, ShieldCheck } from "lucide-react";
+import { LogOut, RefreshCw, Send, ShieldCheck, Trash2 } from "lucide-react";
 
 type AdminMessage = {
   id: string;
@@ -153,6 +153,37 @@ export default function AdminPage() {
     setMessages([]);
   };
 
+  const handleDeleteConversation = async (visitorId: string) => {
+    if (
+      !window.confirm(
+        "¿Eliminar esta conversación permanentemente? Esta acción no se puede deshacer."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/admin/conversations", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visitorId }),
+      });
+
+      if (!response.ok) {
+        window.alert("No se pudo eliminar la conversación. Intenta de nuevo.");
+        return;
+      }
+
+      if (selectedIdRef.current === visitorId) {
+        setSelectedId(null);
+        setMessages([]);
+      }
+      await refreshConversations();
+    } catch {
+      window.alert("No se pudo eliminar la conversación. Intenta de nuevo.");
+    }
+  };
+
   const handleReply = async () => {
     const text = draft.trim();
     if (!text || !selectedId || sending) return;
@@ -301,11 +332,14 @@ export default function AdminPage() {
             {conversations.map((conversation) => {
               const isActive = conversation.visitorId === selectedId;
               return (
-                <li key={conversation.visitorId}>
+                <li
+                  key={conversation.visitorId}
+                  className="flex items-center gap-1"
+                >
                   <button
                     type="button"
                     onClick={() => setSelectedId(conversation.visitorId)}
-                    className={`w-full rounded-2xl px-4 py-3 text-left transition ${
+                    className={`min-w-0 flex-1 rounded-2xl px-4 py-3 text-left transition ${
                       isActive
                         ? "bg-[#7B2CFF]/10 ring-1 ring-inset ring-[#7B2CFF]/40"
                         : "hover:bg-[#F4F1EF]"
@@ -335,6 +369,17 @@ export default function AdminPage() {
                         ? formatTime(conversation.lastMessage.at)
                         : ""}
                     </p>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Eliminar conversación de ${conversation.name}`}
+                    title="Eliminar conversación"
+                    onClick={() =>
+                      handleDeleteConversation(conversation.visitorId)
+                    }
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#999] transition hover:bg-red-50 hover:text-red-500"
+                  >
+                    <Trash2 size={16} />
                   </button>
                 </li>
               );
