@@ -39,6 +39,7 @@ export default function ChatWidget() {
   const [draft, setDraft] = useState("");
   const [name, setName] = useState("");
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const visitorIdRef = useRef("");
@@ -112,7 +113,7 @@ export default function ChatWidget() {
 
     const visitorId = visitorIdRef.current || getVisitorId();
     setSending(true);
-    setDraft("");
+    setSendError(false);
 
     try {
       const response = await fetch("/api/chat", {
@@ -124,9 +125,12 @@ export default function ChatWidget() {
       if (response.ok) {
         const data = (await response.json()) as { messages: ChatMessage[] };
         setMessages(data.messages);
+        setDraft("");
+      } else {
+        setSendError(true);
       }
     } catch {
-      // Se reintenta con el próximo envío.
+      setSendError(true);
     } finally {
       setSending(false);
     }
@@ -192,6 +196,12 @@ export default function ChatWidget() {
           </div>
 
           <div className="border-t border-[#EEE7E2] bg-white px-4 py-3">
+            {sendError ? (
+              <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+                No se pudo enviar el mensaje. Revisa tu conexión e intenta de
+                nuevo.
+              </p>
+            ) : null}
             <input
               type="text"
               value={name}

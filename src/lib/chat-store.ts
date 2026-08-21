@@ -69,6 +69,23 @@ const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const USE_REDIS = Boolean(REDIS_URL && REDIS_TOKEN);
 
+export function getStorageMode(): "redis" | "file" {
+  return USE_REDIS ? "redis" : "file";
+}
+
+export async function pingStorage(): Promise<{
+  ok: boolean;
+  error?: string;
+}> {
+  if (!USE_REDIS) return { ok: false };
+  try {
+    await redisCommand<string>(["PING"]);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: String(error) };
+  }
+}
+
 const CONV_KEY_PREFIX = "safesound:chat:conv:";
 const INDEX_KEY = "safesound:chat:index";
 const CONV_TTL_SECONDS = 90 * 24 * 60 * 60;
@@ -262,7 +279,15 @@ async function redisListConversations(): Promise<Conversation[]> {
   return conversations.sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+function resolveDataDir(): string {
+  // En serverless (Vercel) el directorio del proyecto es de solo lectura.
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join("/tmp", "safesound-data");
+  }
+  return path.join(process.cwd(), ".data");
+}
+
+const DATA_DIR = resolveDataDir();
 const DATA_FILE = path.join(DATA_DIR, "chat.json");
 
 let writeQueue: Promise<unknown> = Promise.resolve();

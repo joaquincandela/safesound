@@ -39,6 +39,7 @@ export default function AdminPage() {
   const [messages, setMessages] = useState<AdminMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [replyError, setReplyError] = useState(false);
 
   const selectedIdRef = useRef<string | null>(null);
   selectedIdRef.current = selectedId;
@@ -157,7 +158,7 @@ export default function AdminPage() {
     if (!text || !selectedId || sending) return;
 
     setSending(true);
-    setDraft("");
+    setReplyError(false);
 
     try {
       const response = await fetch("/api/admin/messages", {
@@ -166,9 +167,14 @@ export default function AdminPage() {
         body: JSON.stringify({ visitorId: selectedId, text }),
       });
       if (response.ok) {
+        setDraft("");
         await refreshThread();
         await refreshConversations();
+      } else {
+        setReplyError(true);
       }
+    } catch {
+      setReplyError(true);
     } finally {
       setSending(false);
     }
@@ -406,27 +412,34 @@ export default function AdminPage() {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="flex items-center gap-2 border-t border-[#EEE7E2] px-4 py-4 sm:px-6">
-                <input
-                  type="text"
-                  value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") handleReply();
-                  }}
-                  placeholder="Responder como SafeSound..."
-                  maxLength={1000}
-                  className="w-full rounded-full border border-[#DDD6D0] bg-white px-5 py-3 text-sm text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
-                />
-                <button
-                  type="button"
-                  aria-label="Enviar respuesta"
-                  onClick={handleReply}
-                  disabled={!draft.trim() || sending}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_18px_rgba(183,255,0,0.5)] transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
-                >
-                  <Send size={18} />
-                </button>
+              <div className="border-t border-[#EEE7E2] px-4 py-4 sm:px-6">
+                {replyError ? (
+                  <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+                    No se pudo enviar la respuesta. Intenta de nuevo.
+                  </p>
+                ) : null}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") handleReply();
+                    }}
+                    placeholder="Responder como SafeSound..."
+                    maxLength={1000}
+                    className="w-full rounded-full border border-[#DDD6D0] bg-white px-5 py-3 text-sm text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF]"
+                  />
+                  <button
+                    type="button"
+                    aria-label="Enviar respuesta"
+                    onClick={handleReply}
+                    disabled={!draft.trim() || sending}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_18px_rgba(183,255,0,0.5)] transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
               </div>
             </>
           ) : (
