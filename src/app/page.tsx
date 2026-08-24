@@ -14,23 +14,21 @@ import {
   Moon,
   RefreshCw,
   ShieldCheck,
+  ShoppingCart,
   Star,
   Volume2,
 } from "lucide-react";
 import PurchaseModal from "../components/PurchaseModal";
 import ChatWidget from "../components/ChatWidget";
+import CartDrawer from "../components/CartDrawer";
 import VoidCatalogGrid from "../components/VoidCatalogGrid";
-import VoidVariantSelector from "../components/VoidVariantSelector";
+import { CartProvider, useCart } from "../lib/cart-context";
 import {
-  buildVoidWhatsAppMessage,
   getVoidVariantById,
   getVoidVariantImage,
   VOID_FALLBACK_IMAGE,
-  VOID_NOISE_REDUCTION,
-  VOID_PRICE_LABEL,
   VOID_PRICE_VALUE,
   VOID_PRODUCT_NAME,
-  voidIncludedItems,
   voidVariants,
   type VoidVariant,
 } from "../lib/void-catalog";
@@ -93,36 +91,23 @@ const reviews = [
   },
 ];
 
-const includedCards = [
-  {
-    icon: ShieldCheck,
-    title: "Earplugs VOID",
-    text: "Protección auditiva premium",
-  },
-  {
-    icon: Cross,
-    title: "Estuche portátil",
-    text: "Listos para llevar contigo",
-  },
-  {
-    icon: RefreshCw,
-    title: "2 pares extra",
-    text: "Tallas de repuesto incluidas",
-  },
-  {
-    icon: Feather,
-    title: "Silicona médica",
-    text: "Hipoalergénica y lavable",
-  },
-];
-
 type ProductSlide = {
   alt: string;
   caption: string;
   src: string;
+  kind?: "image" | "video";
 };
 
 export default function SafeSound() {
+  return (
+    <CartProvider>
+      <SafeSoundLanding />
+    </CartProvider>
+  );
+}
+
+function SafeSoundLanding() {
+  const { totalQuantity, addItem, openCart } = useCart();
   const [selectedVariant, setSelectedVariant] = useState<VoidVariant>(voidVariants[0]);
   const [activeProductSlide, setActiveProductSlide] = useState(0);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
@@ -130,6 +115,7 @@ export default function SafeSound() {
     variant: "compra" | "empresa" | "healthy";
     product?: string;
   } | null>(null);
+  const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
 
   const [isDragging, setIsDragging] = useState(false);
   const [renderDragOffset, setRenderDragOffset] = useState(0);
@@ -137,6 +123,7 @@ export default function SafeSound() {
   const dragStartX = useRef(0);
   const dragOffsetRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const isHoveringGalleryRef = useRef(false);
   const purchaseSectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -195,13 +182,18 @@ export default function SafeSound() {
     }
   };
 
-  const handleOpenWhatsApp = () => {
-    const message = buildVoidWhatsAppMessage(selectedVariant);
-    window.open(
-      `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 2600);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  const handleAddToCart = (variant: VoidVariant) => {
+    addItem(variant);
+    setToast({
+      id: Date.now(),
+      text: `${variant.name} agregado al carrito ✓`,
+    });
   };
 
   const goToPreviousSlide = () => {
@@ -215,6 +207,17 @@ export default function SafeSound() {
       current === productSlides.length - 1 ? 0 : current + 1
     );
   };
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (!isDraggingRef.current && !isHoveringGalleryRef.current) {
+        setActiveProductSlide((current) =>
+          current === productSlides.length - 1 ? 0 : current + 1
+        );
+      }
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [activeProductSlide, productSlides.length]);
 
   const handleBrokenImage = (src: string) => {
     setBrokenImages((current) => ({ ...current, [src]: true }));
@@ -280,6 +283,24 @@ export default function SafeSound() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label={
+                totalQuantity > 0
+                  ? `Abrir carrito, ${totalQuantity} unidades`
+                  : "Abrir carrito"
+              }
+              className="relative flex h-12 w-12 items-center justify-center rounded-full border border-[#DDD6D0] bg-white text-[#252525] shadow-sm transition hover:scale-105 hover:border-[#7B2CFF] hover:text-[#7B2CFF]"
+            >
+              <ShoppingCart size={20} />
+              {totalQuantity > 0 ? (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#7B2CFF] px-1 text-xs font-black text-white shadow-sm">
+                  {totalQuantity}
+                </span>
+              ) : null}
+            </button>
+
             <button
               type="button"
               onClick={() => setModal({ variant: "compra", product: VOID_PRODUCT_NAME })}
@@ -435,10 +456,7 @@ export default function SafeSound() {
         </div>
       </section>
 
-      <section
-        ref={purchaseSectionRef}
-        className="mx-auto grid max-w-7xl items-start gap-12 px-6 py-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]"
-      >
+      <section className="mx-auto max-w-7xl px-6 py-16">
         <div className="relative">
           <div className="absolute h-[400px] w-[400px] rounded-full bg-[#7B2CFF]/20 blur-[100px]" />
           <div
@@ -449,19 +467,25 @@ export default function SafeSound() {
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
+            onMouseEnter={() => {
+              isHoveringGalleryRef.current = true;
+            }}
+            onMouseLeave={() => {
+              isHoveringGalleryRef.current = false;
+            }}
             onKeyDown={(event) => {
               if (event.key === "ArrowLeft") goToPreviousSlide();
               if (event.key === "ArrowRight") goToNextSlide();
             }}
-            className="relative overflow-hidden rounded-[2rem] outline-none"
+            className="relative overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_18%_18%,#7B2CFF1F,transparent_42%),radial-gradient(circle_at_85%_78%,#B7FF0026,transparent_40%),linear-gradient(160deg,#FFFFFF_0%,#F4F1EF_55%,#ECE7E1_100%)] outline-none"
           >
-            <div className="relative min-h-[22rem] sm:min-h-[28rem]">
+            <div className="relative aspect-square w-full sm:aspect-[4/3] lg:aspect-[2/1]">
               <div className="absolute left-5 top-5 z-20 rounded-full border border-white/15 bg-[#252525]/78 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-white/85 backdrop-blur">
                 {currentProductSlide.caption}
               </div>
 
               <div
-                className={`flex w-full ${isDragging ? "" : "transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"}`}
+                className={`flex h-full w-full ${isDragging ? "" : "transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"}`}
                 style={{
                   transform: `translateX(calc(-${activeProductSlide * 100}% + ${
                     isDragging ? renderDragOffset : 0
@@ -470,21 +494,36 @@ export default function SafeSound() {
                 }}
               >
                 {productSlides.map((slide) => (
-                  <div key={`${slide.caption}-${slide.src}`} className="relative w-full shrink-0 basis-full">
-                    <Image
-                      src={slide.src}
-                      alt={slide.alt}
-                      width={1254}
-                      height={1254}
-                      quality={100}
-                      draggable={false}
-                      sizes="(min-width: 1024px) 38rem, 100vw"
-                      onError={() => handleBrokenImage(slide.src)}
-                      className="relative z-10 aspect-square w-full rounded-[2rem] border border-white/10 object-cover shadow-[0_28px_80px_rgba(0,0,0,0.32)]"
-                    />
+                  <div
+                    key={`${slide.caption}-${slide.src}`}
+                    className="relative flex h-full w-full shrink-0 basis-full items-center justify-center p-6 sm:p-10 lg:p-14"
+                  >
+                    {slide.kind === "video" ? (
+                      <video
+                        key={slide.src}
+                        src={slide.src}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="h-full w-full rounded-xl object-contain shadow-[0_24px_60px_rgba(37,37,37,0.22)]"
+                      />
+                    ) : (
+                      <Image
+                        src={slide.src}
+                        alt={slide.alt}
+                        width={1254}
+                        height={1254}
+                        quality={100}
+                        draggable={false}
+                        sizes="(min-width: 1024px) 60vw, 100vw"
+                        onError={() => handleBrokenImage(slide.src)}
+                        className="h-full w-full object-contain drop-shadow-[0_28px_50px_rgba(37,37,37,0.22)]"
+                      />
+                    )}
                   </div>
                 ))}
               </div>
+              <div className="pointer-events-none absolute inset-0 rounded-[2rem] border border-[#DDD6D0] shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_28px_80px_rgba(37,37,37,0.14)]" />
 
               <button
                 type="button"
@@ -494,9 +533,9 @@ export default function SafeSound() {
                   goToPreviousSlide();
                 }}
                 onPointerDown={(event) => event.stopPropagation()}
-                className="absolute left-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)]"
+                className="absolute left-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)] md:h-12 md:w-12"
               >
-                <ChevronLeft size={18} strokeWidth={2.5} />
+                <ChevronLeft size={20} strokeWidth={2.5} />
               </button>
 
               <button
@@ -507,9 +546,9 @@ export default function SafeSound() {
                   goToNextSlide();
                 }}
                 onPointerDown={(event) => event.stopPropagation()}
-                className="absolute right-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)]"
+                className="absolute right-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)] md:h-12 md:w-12"
               >
-                <ChevronRight size={18} strokeWidth={2.5} />
+                <ChevronRight size={20} strokeWidth={2.5} />
               </button>
             </div>
 
@@ -534,103 +573,13 @@ export default function SafeSound() {
             </div>
           </div>
         </div>
-
-        <div className="w-full lg:max-w-[35rem]">
-          <p className="font-bold uppercase tracking-widest text-[#7B2CFF]">
-            Producto principal
-          </p>
-          <div className="mt-5 flex flex-wrap items-end gap-4">
-            <h2 className="text-5xl font-black xl:text-6xl">{VOID_PRODUCT_NAME}</h2>
-            <p className="pb-1 text-2xl font-black text-[#252525]">{VOID_PRICE_LABEL}</p>
-          </div>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-[#555] sm:text-lg">
-            Selecciona el acabado exacto de tus earplugs y pide ese mismo modelo
-            directamente por WhatsApp. La experiencia mantiene el estilo actual
-            de SafeSound y añade una capa de catálogo simple y premium.
-          </p>
-
-          <div className="mt-8 rounded-[1.8rem] border border-[#DDD6D0] bg-white/90 p-5 shadow-sm backdrop-blur sm:p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
-                  Selecciona tu acabado
-                </p>
-                <p className="mt-2 text-sm text-[#6F6A66]">
-                  {voidVariants.length} modelos disponibles · Precio único {VOID_PRICE_VALUE}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setModal({ variant: "compra", product: VOID_PRODUCT_NAME })}
-                className="hidden rounded-full border border-[#DDD6D0] px-5 py-3 text-sm font-black text-[#252525] transition hover:border-[#7B2CFF] hover:text-[#7B2CFF] md:inline-flex"
-              >
-                Comprar con datos
-              </button>
-            </div>
-
-            <div className="mt-6">
-              <VoidVariantSelector
-                selectedId={selectedVariant.id}
-                variants={voidVariants}
-                onSelect={(variant) => handleVariantSelect(variant)}
-              />
-            </div>
-
-            <div className="mt-5 rounded-[1.5rem] border border-[#EEE7E2] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F2_100%)] p-4 sm:p-5">
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#7B2CFF]">
-                Acabado seleccionado
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <h3 className="text-xl font-black text-[#252525] sm:text-2xl">
-                  {selectedVariant.name}
-                </h3>
-                <span className="rounded-full bg-[#252525] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white">
-                  {selectedVariant.reference}
-                </span>
-              </div>
-              <p className="mt-2 text-[#6F6A66]">{selectedVariant.finish}</p>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {includedCards.map(({ icon: Icon, title, text }) => (
-                  <div
-                    key={title}
-                    className="rounded-[1.2rem] border border-[#E8E1DC] bg-white p-3.5 transition hover:-translate-y-0.5 hover:shadow-md"
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7B2CFF]/8">
-                      <Icon className="text-[#7B2CFF]" size={20} />
-                    </div>
-                    <p className="mt-3 text-sm font-black text-[#252525]">{title}</p>
-                    <p className="mt-1 text-sm leading-snug text-[#6F6A66]">{text}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2.5 text-sm text-[#555]">
-                <span className="rounded-full border border-[#E8E1DC] bg-white px-3.5 py-2">
-                  Reducción de ruido {VOID_NOISE_REDUCTION}
-                </span>
-                <span className="rounded-full border border-[#E8E1DC] bg-white px-3.5 py-2">
-                  Reutilizables y lavables
-                </span>
-                <span className="rounded-full border border-[#E8E1DC] bg-white px-3.5 py-2">
-                  Silicona médica hipoalergénica
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleOpenWhatsApp}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#7B2CFF] px-7 py-3.5 font-black text-white transition hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(123,44,255,0.2)] sm:w-auto"
-              >
-                <MessageCircle size={20} />
-                Pedir por WhatsApp
-              </button>
-            </div>
-          </div>
-        </div>
       </section>
 
-      <section id="catalogo" className="mx-auto max-w-7xl px-6 py-16">
+      <section
+        id="catalogo"
+        ref={purchaseSectionRef}
+        className="mx-auto max-w-7xl px-6 py-16"
+      >
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
@@ -656,6 +605,7 @@ export default function SafeSound() {
             brokenImages={brokenImages}
             onBrokenImage={handleBrokenImage}
             onSelect={(variant) => handleVariantSelect(variant, true)}
+            onAddToCart={handleAddToCart}
           />
         </div>
       </section>
@@ -800,6 +750,8 @@ export default function SafeSound() {
         © 2026 SafeSound - Mute the Noise
       </footer>
 
+      <CartDrawer whatsappNumber={waNumber} />
+
       <ChatWidget
         selectedVariant={selectedVariant}
         variants={voidVariants}
@@ -813,6 +765,17 @@ export default function SafeSound() {
         selectedVoidVariant={selectedVariant}
         onClose={() => setModal(null)}
       />
+
+      {toast ? (
+        <div
+          key={toast.id}
+          role="status"
+          aria-live="polite"
+          className="toast-enter fixed bottom-6 left-1/2 z-[110] -translate-x-1/2 whitespace-nowrap rounded-full border border-white/10 bg-[#252525]/95 px-6 py-3.5 text-sm font-bold text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur"
+        >
+          {toast.text}
+        </div>
+      ) : null}
     </main>
   );
 }

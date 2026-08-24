@@ -19,6 +19,10 @@
 }
 
 @layer components {
+  .toast-enter {
+    animation: toast-in 0.28s ease-out;
+  }
+
   .float-slow {
     animation: float-slow 6.5s ease-in-out infinite;
   }
@@ -39,6 +43,18 @@
       rgba(139, 115, 85, 0.05) 50%,
       transparent 100%
     );
+  }
+}
+
+@keyframes toast-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
 

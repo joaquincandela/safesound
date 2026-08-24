@@ -11,6 +11,7 @@ export type VoidVariant = {
 export const VOID_PRODUCT_NAME = "VOID";
 export const VOID_PRICE_LABEL = "S/ 65";
 export const VOID_PRICE_VALUE = "S/ 65.00";
+export const VOID_PRICE_AMOUNT = 65;
 export const VOID_NOISE_REDUCTION = "-23 dB";
 export const VOID_FALLBACK_IMAGE = "/images/mute-hero-hd.png";
 

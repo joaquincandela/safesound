@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ShoppingCart } from "lucide-react";
 import type { VoidVariant } from "../lib/void-catalog";
 import {
   getVoidVariantImage,
@@ -14,6 +15,7 @@ type Props = {
   brokenImages: Record<string, boolean>;
   onBrokenImage: (src: string) => void;
   onSelect: (variant: VoidVariant) => void;
+  onAddToCart: (variant: VoidVariant) => void;
 };
 
 export default function VoidCatalogGrid({
@@ -22,6 +24,7 @@ export default function VoidCatalogGrid({
   brokenImages,
   onBrokenImage,
   onSelect,
+  onAddToCart,
 }: Props) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -71,17 +74,28 @@ export default function VoidCatalogGrid({
                 Ref. {variant.reference}
               </p>
 
-              <button
-                type="button"
-                onClick={() => onSelect(variant)}
-                className={`mt-5 w-full rounded-full px-5 py-3 text-sm font-black transition ${
-                  isSelected
-                    ? "bg-[#252525] text-white hover:bg-black"
-                    : "border border-[#7B2CFF]/18 bg-[#7B2CFF]/8 text-[#7B2CFF] hover:bg-[#7B2CFF] hover:text-white"
-                }`}
-              >
-                {isSelected ? "Seleccionado" : "Seleccionar"}
-              </button>
+              <div className="mt-5 space-y-2.5">
+                <button
+                  type="button"
+                  onClick={() => onAddToCart(variant)}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#7B2CFF] px-5 py-3 text-sm font-black text-white transition hover:scale-[1.01] hover:shadow-[0_14px_30px_rgba(123,44,255,0.28)]"
+                >
+                  <ShoppingCart size={16} />
+                  Agregar al carrito
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onSelect(variant)}
+                  className={`w-full rounded-full px-5 py-3 text-sm font-black transition ${
+                    isSelected
+                      ? "bg-[#252525] text-white hover:bg-black"
+                      : "border border-[#7B2CFF]/18 bg-[#7B2CFF]/8 text-[#7B2CFF] hover:bg-[#7B2CFF] hover:text-white"
+                  }`}
+                >
+                  {isSelected ? "Seleccionado" : "Seleccionar"}
+                </button>
+              </div>
             </div>
           </article>
         );
