@@ -26,6 +26,7 @@ export async function GET(request: Request) {
       sender: message.sender,
       text: message.text,
       at: message.at,
+      readByAdmin: message.readByAdmin,
     })),
   });
 }

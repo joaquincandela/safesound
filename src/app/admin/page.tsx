@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { LogOut, RefreshCw, Send, ShieldCheck, Trash2 } from "lucide-react";
+import { useKeyboardAwarePosition } from "../../lib/use-keyboard-aware-position";
 
 type AdminMessage = {
   id: string;
   sender: "visitor" | "admin";
   text: string;
   at: number;
+  readByAdmin?: boolean;
 };
 
 type ConversationSummary = {
@@ -40,11 +42,21 @@ export default function AdminPage() {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [replyError, setReplyError] = useState(false);
+  const [threadSectionHeight, setThreadSectionHeight] = useState<
+    number | undefined
+  >(undefined);
 
   const selectedIdRef = useRef<string | null>(null);
   selectedIdRef.current = selectedId;
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const threadScrollRef = useRef<HTMLDivElement | null>(null);
+  const threadSectionRef = useRef<HTMLElement | null>(null);
+  const composerRef = useRef<HTMLDivElement | null>(null);
+  const stickToBottomRef = useRef(true);
+  const deselectedRef = useRef(false);
+  const threadFetchSeqRef = useRef(0);
+  const conversationsFetchingRef = useRef(false);
+  const keyboard = useKeyboardAwarePosition();
 
   useEffect(() => {
     fetch("/api/admin/conversations", { cache: "no-store" })
@@ -54,6 +66,9 @@ export default function AdminPage() {
   }, []);
 
   const refreshConversations = useCallback(async () => {
+    if (conversationsFetchingRef.current) return;
+    conversationsFetchingRef.current = true;
+
     try {
       const response = await fetch("/api/admin/conversations", {
         cache: "no-store",
@@ -64,11 +79,17 @@ export default function AdminPage() {
       };
       setConversations(data.conversations);
 
-      if (!selectedIdRef.current && data.conversations.length > 0) {
+      if (
+        !selectedIdRef.current &&
+        !deselectedRef.current &&
+        data.conversations.length > 0
+      ) {
         setSelectedId(data.conversations[0].visitorId);
       }
     } catch {
       // Se reintenta en el siguiente ciclo.
+    } finally {
+      conversationsFetchingRef.current = false;
     }
   }, []);
 
@@ -76,6 +97,7 @@ export default function AdminPage() {
     const visitorId = selectedIdRef.current;
     if (!visitorId) return;
 
+    const seq = ++threadFetchSeqRef.current;
     try {
       const response = await fetch(
         `/api/admin/messages?visitorId=${encodeURIComponent(visitorId)}`,
@@ -87,11 +109,14 @@ export default function AdminPage() {
         name: string;
         messages: AdminMessage[];
       };
+      if (seq !== threadFetchSeqRef.current) return;
+
       setThreadName(data.name);
       setMessages(data.messages);
 
       const hasUnreadVisitorMessages = data.messages.some(
-        (message) => message.sender === "visitor"
+        (message) =>
+          message.sender === "visitor" && message.readByAdmin === false
       );
       if (hasUnreadVisitorMessages) {
         fetch("/api/admin/conversations", {
@@ -120,8 +145,30 @@ export default function AdminPage() {
   }, [authenticated, selectedId, refreshThread]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    stickToBottomRef.current = true;
+    const container = threadScrollRef.current;
+    if (container) container.scrollTop = container.scrollHeight;
+  }, [selectedId]);
+
+  useEffect(() => {
+    const container = threadScrollRef.current;
+    if (container && stickToBottomRef.current) {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
   }, [messages]);
+
+  useEffect(() => {
+    if (!keyboard.enabled) {
+      setThreadSectionHeight(undefined);
+      return;
+    }
+    const section = threadSectionRef.current;
+    if (section) {
+      const rect = section.getBoundingClientRect();
+      const visualBottom = keyboard.top + keyboard.height;
+      setThreadSectionHeight(Math.max(visualBottom - rect.top, 288));
+    }
+  }, [keyboard.enabled, keyboard.top, keyboard.height]);
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -338,7 +385,10 @@ export default function AdminPage() {
                 >
                   <button
                     type="button"
-                    onClick={() => setSelectedId(conversation.visitorId)}
+                    onClick={() => {
+                      deselectedRef.current = false;
+                      setSelectedId(conversation.visitorId);
+                    }}
                     className={`min-w-0 flex-1 rounded-2xl px-4 py-3 text-left transition ${
                       isActive
                         ? "bg-[#7B2CFF]/10 ring-1 ring-inset ring-[#7B2CFF]/40"
@@ -388,6 +438,12 @@ export default function AdminPage() {
         </aside>
 
         <section
+          ref={threadSectionRef}
+          style={
+            keyboard.enabled && threadSectionHeight
+              ? { height: threadSectionHeight }
+              : undefined
+          }
           className={`${
             selectedId ? "flex" : "hidden lg:flex"
           } h-[75dvh] min-h-[28rem] flex-col overflow-hidden rounded-[2rem] border border-[#DDD6D0] bg-white lg:h-auto lg:max-h-[70dvh] lg:min-h-[32rem]`}
@@ -399,7 +455,10 @@ export default function AdminPage() {
                   <button
                     type="button"
                     aria-label="Volver a conversaciones"
-                    onClick={() => setSelectedId(null)}
+                    onClick={() => {
+                      deselectedRef.current = true;
+                      setSelectedId(null);
+                    }}
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#555] transition hover:bg-[#F4F1EF] hover:text-[#7B2CFF] lg:hidden"
                   >
                     ←
@@ -424,7 +483,18 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              <div className="flex-1 space-y-3 overflow-y-auto bg-[#F4F1EF] px-4 py-5 sm:px-6">
+              <div
+                ref={threadScrollRef}
+                onScroll={(event) => {
+                  const element = event.currentTarget;
+                  stickToBottomRef.current =
+                    element.scrollHeight -
+                      element.scrollTop -
+                      element.clientHeight <
+                    88;
+                }}
+                className="flex-1 space-y-3 overflow-y-auto bg-[#F4F1EF] px-4 py-5 sm:px-6"
+              >
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -454,10 +524,12 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
-                <div ref={messagesEndRef} />
               </div>
 
-              <div className="border-t border-[#EEE7E2] px-4 py-4 sm:px-6">
+              <div
+                  ref={composerRef}
+                  className="border-t border-[#EEE7E2] px-4 py-4 sm:px-6"
+                >
                 {replyError ? (
                   <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
                     No se pudo enviar la respuesta. Intenta de nuevo.
@@ -468,6 +540,15 @@ export default function AdminPage() {
                     type="text"
                     value={draft}
                     onChange={(event) => setDraft(event.target.value)}
+                    onFocus={() => {
+                      if (window.matchMedia("(max-width: 639px)").matches) {
+                        window.setTimeout(() => {
+                          composerRef.current?.scrollIntoView({
+                            block: "nearest",
+                          });
+                        }, 300);
+                      }
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter") handleReply();
                     }}

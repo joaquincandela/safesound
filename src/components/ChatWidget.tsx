@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import type { VoidVariant } from "../lib/void-catalog";
+import { useKeyboardAwarePosition } from "../lib/use-keyboard-aware-position";
 
 type ChatMessage = {
   id: string;
@@ -19,6 +20,7 @@ type Props = {
 
 const VISITOR_ID_KEY = "safesound_chat_visitor_id";
 const VISITOR_NAME_KEY = "safesound_chat_visitor_name";
+const CHAT_OPEN_STATE_KEY = "safesound_chat_open";
 
 function getVisitorId(): string {
   if (typeof window === "undefined") return "";
@@ -55,11 +57,25 @@ export default function ChatWidget({
   const [selectorOpen, setSelectorOpen] = useState(false);
 
   const visitorIdRef = useRef("");
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesScrollRef = useRef<HTMLDivElement | null>(null);
+  const stickToBottomRef = useRef(true);
+  const keyboard = useKeyboardAwarePosition();
 
   useEffect(() => {
     visitorIdRef.current = getVisitorId();
     setName(window.localStorage.getItem(VISITOR_NAME_KEY) ?? "");
+  }, []);
+
+  useEffect(() => {
+    if (window.sessionStorage.getItem(CHAT_OPEN_STATE_KEY) !== "open") return;
+    const visitorId = visitorIdRef.current || getVisitorId();
+    setOpen(true);
+    setUnreadCount(0);
+    fetch("/api/chat/read", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitorId }),
+    }).catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -107,13 +123,17 @@ export default function ChatWidget({
   }, [fetchMessages, open]);
 
   useEffect(() => {
-    if (open) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!open) return;
+    const container = messagesScrollRef.current;
+    if (container && stickToBottomRef.current) {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
     }
   }, [messages, open]);
 
   const handleOpen = () => {
+    stickToBottomRef.current = true;
     setOpen(true);
+    window.sessionStorage.setItem(CHAT_OPEN_STATE_KEY, "open");
     setUnreadCount(0);
     const visitorId = visitorIdRef.current || getVisitorId();
     fetch("/api/chat/read", {
@@ -121,6 +141,11 @@ export default function ChatWidget({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ visitorId }),
     }).catch(() => undefined);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    window.sessionStorage.setItem(CHAT_OPEN_STATE_KEY, "closed");
   };
 
   const handleNameChange = (value: string) => {
@@ -179,7 +204,14 @@ export default function ChatWidget({
   return (
     <>
       {open ? (
-        <div className="fixed inset-x-0 bottom-0 z-[60] flex h-[88dvh] touch-manipulation flex-col overflow-hidden rounded-t-[1.5rem] border border-b-0 border-[#DDD6D0] bg-white shadow-[0_-12px_60px_rgba(0,0,0,0.28)] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[34rem] sm:max-w-[calc(100vw-3rem)] sm:rounded-[2rem] sm:border sm:border-b sm:shadow-[0_28px_80px_rgba(0,0,0,0.32)]">
+        <div
+          className="fixed inset-x-0 bottom-0 z-[60] flex h-[88dvh] touch-manipulation flex-col overflow-hidden rounded-t-[1.5rem] border border-b-0 border-[#DDD6D0] bg-white shadow-[0_-12px_60px_rgba(0,0,0,0.28)] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[34rem] sm:max-w-[calc(100vw-3rem)] sm:rounded-[2rem] sm:border sm:border-b sm:shadow-[0_28px_80px_rgba(0,0,0,0.32)]"
+          style={
+            keyboard.enabled
+              ? { top: keyboard.top, height: keyboard.height }
+              : undefined
+          }
+        >
           <div className="flex items-center justify-between bg-[#252525] px-5 py-4">
             <div>
               <p className="font-black text-white">SafeSound</p>
@@ -191,7 +223,7 @@ export default function ChatWidget({
             <button
               type="button"
               aria-label="Cerrar chat"
-              onClick={() => setOpen(false)}
+              onClick={handleClose}
               className="flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition active:bg-white/20 hover:bg-white/10 hover:text-white"
             >
               <X size={22} />
@@ -261,7 +293,16 @@ export default function ChatWidget({
             ) : null}
           </div>
 
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#F4F1EF] px-4 py-4">
+          <div
+            ref={messagesScrollRef}
+            onScroll={(event) => {
+              const element = event.currentTarget;
+              stickToBottomRef.current =
+                element.scrollHeight - element.scrollTop - element.clientHeight <
+                80;
+            }}
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#F4F1EF] px-4 py-4"
+          >
             {messages.length === 0 ? (
               <div className="mt-8 text-center text-sm text-[#666]">
                 Escríbenos y te respondemos lo antes posible.
@@ -293,7 +334,6 @@ export default function ChatWidget({
                 </div>
               </div>
             ))}
-            <div ref={messagesEndRef} />
           </div>
 
           <div className="border-t border-[#EEE7E2] bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
@@ -338,7 +378,7 @@ export default function ChatWidget({
 
       <button
         type="button"
-        onClick={() => (open ? setOpen(false) : handleOpen())}
+        onClick={() => (open ? handleClose() : handleOpen())}
         aria-label="Abrir chat de SafeSound"
         className="fixed bottom-5 right-5 z-[60] flex h-16 w-16 touch-manipulation items-center justify-center rounded-full bg-[#B7FF00] text-black shadow-[0_0_35px_rgba(183,255,0,0.75)] transition active:scale-95 hover:scale-110 sm:bottom-6 sm:right-6"
       >
