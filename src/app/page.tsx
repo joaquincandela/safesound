@@ -19,7 +19,7 @@ import {
   Volume2,
 } from "lucide-react";
 import PurchaseModal from "../components/PurchaseModal";
-import ChatWidget from "../components/ChatWidget";
+import FaqWidget from "../components/FaqWidget";
 import CartDrawer from "../components/CartDrawer";
 import VoidCatalogGrid from "../components/VoidCatalogGrid";
 import { CartProvider, useCart } from "../lib/cart-context";
@@ -590,7 +590,7 @@ function SafeSoundLanding() {
             </h2>
             <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#666]">
               Elige tu modelo, actualiza la sección principal y pide exactamente
-              ese acabado por WhatsApp o desde el chat interno.
+              ese acabado por WhatsApp.
             </p>
           </div>
           <div className="rounded-[1.5rem] border border-[#DDD6D0] bg-white px-5 py-4 text-sm text-[#555] shadow-sm">
@@ -752,11 +752,7 @@ function SafeSoundLanding() {
 
       <CartDrawer whatsappNumber={waNumber} />
 
-      <ChatWidget
-        selectedVariant={selectedVariant}
-        variants={voidVariants}
-        onSelectVariant={(variant) => handleVariantSelect(variant)}
-      />
+      <FaqWidget />
 
       <PurchaseModal
         open={modal !== null}
