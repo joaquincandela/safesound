@@ -23,8 +23,10 @@ import HeroBackdrop from "../components/HeroBackdrop";
 import TrustedLogos from "../components/TrustedLogos";
 import VideoShowcase from "../components/VideoShowcase";
 import { CartProvider, useCart } from "../lib/cart-context";
+import { trackPixel } from "../lib/meta-pixel";
 import {
   getVoidVariantById,
+  VOID_PRICE_AMOUNT,
   VOID_PRICE_VALUE,
   VOID_PRODUCT_NAME,
   voidVariants,
@@ -119,6 +121,13 @@ function SafeSoundLanding() {
   const handleAddToCart = (variant: VoidVariant) => {
     persistVariant(variant);
     addItem(variant);
+    trackPixel("AddToCart", {
+      content_ids: [variant.reference],
+      content_name: variant.name,
+      content_type: "product",
+      value: VOID_PRICE_AMOUNT,
+      currency: "PEN",
+    });
     setToast({
       id: Date.now(),
       text: `${variant.name} agregado al carrito ✓`,
