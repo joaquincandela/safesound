@@ -25,7 +25,7 @@ export default function VoidCatalogGrid({
   onAddToCart,
 }: Props) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="-mx-6 -my-4 flex snap-x snap-mandatory scroll-px-6 gap-4 overflow-x-auto px-6 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:my-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:py-0 sm:scroll-px-0 xl:grid-cols-4">
       {variants.map((variant) => {
         const isSelected = variant.id === selectedId;
         const imageSrc = brokenImages[variant.imageSrc]
@@ -35,7 +35,7 @@ export default function VoidCatalogGrid({
         return (
           <article
             key={variant.id}
-            className={`overflow-hidden rounded-[1.8rem] border bg-white transition-all duration-300 ${
+            className={`w-[60vw] max-w-[19rem] shrink-0 snap-start overflow-hidden rounded-[1.8rem] border bg-white transition-all duration-300 sm:w-auto sm:max-w-none sm:shrink ${
               isSelected
                 ? "border-[#064DB7] shadow-[0_16px_40px_rgba(6,77,183,0.16)] ring-1 ring-[#064DB7]/20"
                 : "border-[#DDD6D0] shadow-sm hover:-translate-y-1 hover:border-[#064DB7]/25 hover:shadow-xl"
@@ -46,7 +46,7 @@ export default function VoidCatalogGrid({
                 src={imageSrc}
                 alt={variant.name}
                 fill
-                sizes="(min-width: 1280px) 18rem, (min-width: 640px) 50vw, 100vw"
+                sizes="(min-width: 1280px) 18rem, (min-width: 640px) 50vw, min(60vw, 19rem)"
                 className="object-cover transition duration-500 hover:scale-[1.03]"
                 onError={() => onBrokenImage(variant.imageSrc)}
               />
