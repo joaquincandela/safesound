@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import type { CSSProperties } from "react";
 
 const FILM_MS = 6000;
 const HANDOFF_MS = 620;
@@ -10,11 +9,11 @@ const HANDOFF_MS = 620;
 const slides = [
   { src: "/images/_DSC7076.JPG", width: 7008, height: 3944, alt: "" },
   { src: "/images/DSC01038.JPG", width: 6000, height: 3376, alt: "" },
-  { src: "/images/DSC01046.JPG", width: 6000, height: 3376, alt: "" },
+  { src: "/images/EPICKVOID.JPG", width: 7008, height: 3944, alt: "" },
   { src: "/images/DSC01117.JPG", width: 6000, height: 3376, alt: "" },
   { src: "/images/DSC01119.JPG", width: 6000, height: 3376, alt: "" },
   { src: "/images/DSC01434.JPG", width: 6000, height: 3376, alt: "" },
-  { src: "/images/DSC01452.JPG", width: 6000, height: 3376, alt: "" },
+  { src: "/images/PRODUCTOVOID.JPG", width: 6000, height: 3376, alt: "" },
 ];
 
 export default function HeroBackdrop() {
@@ -57,11 +56,7 @@ export default function HeroBackdrop() {
   }, [outgoing, active]);
 
   return (
-    <div
-      className="absolute inset-0 overflow-hidden"
-      aria-hidden="true"
-      style={{ "--film-duration": `${FILM_MS}ms` } as CSSProperties}
-    >
+    <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
       {slides.map((slide, position) => {
         const isActive = position === active;
         const isOutgoing = position === outgoing;
@@ -80,9 +75,7 @@ export default function HeroBackdrop() {
               priority={position === 0}
               sizes="100vw"
               quality={72}
-              className={`object-cover ${
-                isActive ? "animate-ken-burns" : ""
-              }`}
+              className="object-cover"
             />
           </div>
         );

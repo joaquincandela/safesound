@@ -254,7 +254,7 @@ function SafeSoundLanding() {
               onClick={scrollToPurchaseSection}
               className="rounded-full bg-[#E2DFD9] px-8 py-4 font-black text-black transition hover:scale-105"
             >
-              Elegir acabado
+              Elige tus void por S/. 65
             </button>
             <a
               href="#benefits"
