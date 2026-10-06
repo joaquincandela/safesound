@@ -2,6 +2,7 @@ import type { Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { META_PIXEL_ID } from "../lib/meta-pixel";
+import CatalogViewTracker from "../components/CatalogViewTracker";
 
 export const metadata = {
   title: "SafeSound | Mute the Noise",
@@ -46,6 +47,7 @@ fbq('track', 'PageView');`}
             src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
           />
         </noscript>
+        <CatalogViewTracker />
         {children}
       </body>
     </html>
