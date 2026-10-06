@@ -133,7 +133,7 @@ export default function PurchaseModal({
   };
 
   const inputBase =
-    "w-full rounded-xl border border-[#DDD6D0] bg-white px-4 py-3 text-[#252525] outline-none transition placeholder:text-[#aaa] focus:border-[#7B2CFF] focus:ring-2 focus:ring-[#7B2CFF]/20";
+    "w-full rounded-xl border border-[#DDD6D0] bg-white px-4 py-3 text-[#252525] outline-none transition placeholder:text-[#aaa] focus:border-[#064DB7] focus:ring-2 focus:ring-[#064DB7]/20";
 
   const title =
     variant === "empresa"
@@ -176,13 +176,13 @@ export default function PurchaseModal({
                 {useOptions.map((option) => (
                   <label
                     key={option}
-                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#DDD6D0] px-4 py-2.5 transition hover:border-[#7B2CFF] hover:bg-[#7B2CFF]/5"
+                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#DDD6D0] px-4 py-2.5 transition hover:border-[#064DB7] hover:bg-[#064DB7]/5"
                   >
                     <input
                       type="checkbox"
                       checked={opciones.includes(option)}
                       onChange={() => toggleOption(option)}
-                      className="h-4 w-4 accent-[#7B2CFF]"
+                      className="h-4 w-4 accent-[#064DB7]"
                     />
                     <span className="text-sm text-[#252525]">{option}</span>
                   </label>
@@ -321,7 +321,7 @@ export default function PurchaseModal({
 
           <button
             type="submit"
-            className="mt-2 w-full rounded-full bg-[#7B2CFF] px-6 py-4 font-black text-white transition hover:scale-[1.02] hover:shadow-lg"
+            className="mt-2 w-full rounded-full bg-[#064DB7] px-6 py-4 font-black text-white transition hover:scale-[1.02] hover:shadow-lg"
           >
             Continuar por WhatsApp
           </button>

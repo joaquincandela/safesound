@@ -107,7 +107,7 @@ export default function FaqWidget() {
 
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#F4F1EF] px-4 py-4">
             <div className="mb-4 flex items-start gap-3 rounded-2xl border border-[#E0D6CE] bg-white p-4 text-sm text-[#555]">
-              <CircleHelp size={20} className="mt-0.5 shrink-0 text-[#7B2CFF]" />
+              <CircleHelp size={20} className="mt-0.5 shrink-0 text-[#064DB7]" />
               <p>
                 Estas son las preguntas frecuentes con respuesta automática. Si
                 tu duda no aparece aquí, escribénosla y te redirigimos a
@@ -137,7 +137,7 @@ export default function FaqWidget() {
                       <ChevronDown
                         size={18}
                         className={`shrink-0 text-[#777] transition-transform duration-300 ${
-                          isExpanded ? "rotate-180 text-[#7B2CFF]" : ""
+                          isExpanded ? "rotate-180 text-[#064DB7]" : ""
                         }`}
                       />
                     </button>
@@ -153,7 +153,7 @@ export default function FaqWidget() {
           </div>
 
           <div className="border-t border-[#EEE7E2] bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#7B2CFF]">
+            <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#064DB7]">
               <MessageCircleQuestion size={14} />
               ¿Otra duda?
             </p>
@@ -163,7 +163,7 @@ export default function FaqWidget() {
               placeholder="Escribe tu pregunta..."
               rows={2}
               maxLength={600}
-              className="w-full resize-none rounded-2xl border border-[#DDD6D0] bg-white px-4 py-3 text-base text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#7B2CFF] focus:ring-2 focus:ring-[#7B2CFF]/20"
+              className="w-full resize-none rounded-2xl border border-[#DDD6D0] bg-white px-4 py-3 text-base text-[#252525] outline-none transition placeholder:text-[#999] focus:border-[#064DB7] focus:ring-2 focus:ring-[#064DB7]/20"
             />
             <button
               type="button"

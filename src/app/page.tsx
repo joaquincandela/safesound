@@ -5,8 +5,6 @@ import Image from "next/image";
 import {
   Briefcase,
   Building2,
-  ChevronLeft,
-  ChevronRight,
   Cross,
   Feather,
   HeartPulse,
@@ -15,18 +13,18 @@ import {
   RefreshCw,
   ShieldCheck,
   ShoppingCart,
-  Star,
   Volume2,
 } from "lucide-react";
 import PurchaseModal from "../components/PurchaseModal";
 import FaqWidget from "../components/FaqWidget";
 import CartDrawer from "../components/CartDrawer";
 import VoidCatalogGrid from "../components/VoidCatalogGrid";
+import HeroBackdrop from "../components/HeroBackdrop";
+import TrustedLogos from "../components/TrustedLogos";
+import VideoShowcase from "../components/VideoShowcase";
 import { CartProvider, useCart } from "../lib/cart-context";
 import {
   getVoidVariantById,
-  getVoidVariantImage,
-  VOID_FALLBACK_IMAGE,
   VOID_PRICE_VALUE,
   VOID_PRODUCT_NAME,
   voidVariants,
@@ -70,34 +68,6 @@ const benefitBarItems = [
   { icon: Cross, title: "Silicona médica", text: "hipoalergénica" },
 ];
 
-const reviews = [
-  {
-    name: "Andrea",
-    age: 24,
-    context: "Diseñadora gráfica",
-    quote: "Los usé en un festival y me sorprendió lo cómodos que son.",
-  },
-  {
-    name: "Diego",
-    age: 21,
-    context: "Estudiante universitario",
-    quote: "Ahora puedo estudiar en cafeterías sin distraerme tanto.",
-  },
-  {
-    name: "Camila",
-    age: 29,
-    context: "Arquitecta",
-    quote: "En vuelos largos me ayudan muchísimo a descansar mejor.",
-  },
-];
-
-type ProductSlide = {
-  alt: string;
-  caption: string;
-  src: string;
-  kind?: "image" | "video";
-};
-
 export default function SafeSound() {
   return (
     <CartProvider>
@@ -109,7 +79,6 @@ export default function SafeSound() {
 function SafeSoundLanding() {
   const { totalQuantity, addItem, openCart } = useCart();
   const [selectedVariant, setSelectedVariant] = useState<VoidVariant>(voidVariants[0]);
-  const [activeProductSlide, setActiveProductSlide] = useState(0);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const [modal, setModal] = useState<{
     variant: "compra" | "empresa" | "healthy";
@@ -117,13 +86,6 @@ function SafeSoundLanding() {
   } | null>(null);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [renderDragOffset, setRenderDragOffset] = useState(0);
-
-  const dragStartX = useRef(0);
-  const dragOffsetRef = useRef(0);
-  const isDraggingRef = useRef(false);
-  const isHoveringGalleryRef = useRef(false);
   const purchaseSectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -133,32 +95,6 @@ function SafeSoundLanding() {
       setSelectedVariant(getVoidVariantById(storedId));
     }
   }, []);
-
-  const productSlides: ProductSlide[] = [
-    {
-      src: brokenImages[selectedVariant.imageSrc]
-        ? VOID_FALLBACK_IMAGE
-        : getVoidVariantImage(selectedVariant),
-      alt: selectedVariant.name,
-      caption: selectedVariant.shortName,
-    },
-    {
-      src: "/images/product-lifestyle.png",
-      alt: "Producto SafeSound en una composición lifestyle",
-      caption: "Lifestyle premium",
-    },
-    ...voidVariants
-      .filter((variant) => variant.id !== selectedVariant.id)
-      .map((variant) => ({
-        src: brokenImages[variant.imageSrc]
-          ? VOID_FALLBACK_IMAGE
-          : getVoidVariantImage(variant),
-        alt: variant.name,
-        caption: variant.shortName,
-      })),
-  ];
-
-  const currentProductSlide = productSlides[activeProductSlide] ?? productSlides[0];
 
   const persistVariant = (variant: VoidVariant) => {
     setSelectedVariant(variant);
@@ -176,7 +112,6 @@ function SafeSoundLanding() {
 
   const handleVariantSelect = (variant: VoidVariant, shouldScroll = false) => {
     persistVariant(variant);
-    setActiveProductSlide(0);
     if (shouldScroll) {
       requestAnimationFrame(scrollToPurchaseSection);
     }
@@ -196,62 +131,8 @@ function SafeSoundLanding() {
     });
   };
 
-  const goToPreviousSlide = () => {
-    setActiveProductSlide((current) =>
-      current === 0 ? productSlides.length - 1 : current - 1
-    );
-  };
-
-  const goToNextSlide = () => {
-    setActiveProductSlide((current) =>
-      current === productSlides.length - 1 ? 0 : current + 1
-    );
-  };
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      if (!isDraggingRef.current && !isHoveringGalleryRef.current) {
-        setActiveProductSlide((current) =>
-          current === productSlides.length - 1 ? 0 : current + 1
-        );
-      }
-    }, 5000);
-    return () => window.clearInterval(id);
-  }, [activeProductSlide, productSlides.length]);
-
   const handleBrokenImage = (src: string) => {
     setBrokenImages((current) => ({ ...current, [src]: true }));
-  };
-
-  const handlePointerDown = (event: React.PointerEvent) => {
-    isDraggingRef.current = true;
-    setIsDragging(true);
-    dragStartX.current = event.clientX;
-    dragOffsetRef.current = 0;
-    setRenderDragOffset(0);
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-  };
-
-  const handlePointerMove = (event: React.PointerEvent) => {
-    if (!isDraggingRef.current) return;
-    const diff = event.clientX - dragStartX.current;
-    dragOffsetRef.current = diff;
-    setRenderDragOffset(diff);
-  };
-
-  const handlePointerUp = () => {
-    if (!isDraggingRef.current) return;
-    const offset = dragOffsetRef.current;
-    isDraggingRef.current = false;
-    setIsDragging(false);
-    dragOffsetRef.current = 0;
-    setRenderDragOffset(0);
-
-    if (offset < -80) {
-      goToNextSlide();
-    } else if (offset > 80) {
-      goToPreviousSlide();
-    }
   };
 
   return (
@@ -260,24 +141,24 @@ function SafeSoundLanding() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>
             <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-              SAFE<span className="text-[#B7FF00]">SOUND</span>
+              SAFE<span className="text-[#064DB7]">SOUND</span>
             </h1>
-            <p className="text-xs tracking-[0.45em] text-[#7B2CFF]">
+            <p className="text-xs tracking-[0.45em] text-[#064DB7]">
               MUTE THE NOISE
             </p>
           </div>
 
           <nav className="hidden gap-10 font-semibold text-[#555] md:flex">
-            <a href="#mute" className="transition hover:text-[#7B2CFF]">
+            <a href="#mute" className="transition hover:text-[#064DB7]">
               VOID
             </a>
-            <a href="#catalogo" className="transition hover:text-[#7B2CFF]">
+            <a href="#catalogo" className="transition hover:text-[#064DB7]">
               Catálogo
             </a>
-            <a href="#empresas" className="transition hover:text-[#7B2CFF]">
+            <a href="#empresas" className="transition hover:text-[#064DB7]">
               Empresas
             </a>
-            <a href="#healthy" className="transition hover:text-[#7B2CFF]">
+            <a href="#healthy" className="transition hover:text-[#064DB7]">
               Healthy Sound
             </a>
           </nav>
@@ -291,11 +172,11 @@ function SafeSoundLanding() {
                   ? `Abrir carrito, ${totalQuantity} unidades`
                   : "Abrir carrito"
               }
-              className="relative flex h-12 w-12 items-center justify-center rounded-full border border-[#DDD6D0] bg-white text-[#252525] shadow-sm transition hover:scale-105 hover:border-[#7B2CFF] hover:text-[#7B2CFF]"
+              className="relative flex h-12 w-12 items-center justify-center rounded-full border border-[#DDD6D0] bg-white text-[#252525] shadow-sm transition hover:scale-105 hover:border-[#064DB7] hover:text-[#064DB7]"
             >
               <ShoppingCart size={20} />
               {totalQuantity > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#7B2CFF] px-1 text-xs font-black text-white shadow-sm">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#064DB7] px-1 text-xs font-black text-white shadow-sm">
                   {totalQuantity}
                 </span>
               ) : null}
@@ -325,7 +206,7 @@ function SafeSoundLanding() {
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram SafeSound"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-[#DDD6D0] bg-white text-[#7B2CFF] shadow-sm transition hover:scale-105 hover:border-[#7B2CFF] hover:shadow-[0_0_24px_rgba(123,44,255,0.18)]"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[#DDD6D0] bg-white text-[#064DB7] shadow-sm transition hover:scale-105 hover:border-[#064DB7] hover:shadow-[0_0_24px_rgba(6,77,183,0.18)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -344,23 +225,25 @@ function SafeSoundLanding() {
 
       <section
         id="mute"
-        className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-2"
+        className="relative isolate mx-auto grid max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-2"
       >
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#7B2CFF22,transparent_25%),radial-gradient(circle_at_80%_30%,#B7FF0022,transparent_25%)]" />
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 -z-20 w-screen -translate-x-1/2">
+          <HeroBackdrop />
+        </div>
 
         <div>
-          <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-[#7B2CFF]">
+          <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-[#064DB7]">
             <Volume2 size={20} />
             Protección auditiva premium
           </div>
 
-          <h1 className="mt-6 text-7xl font-black leading-none tracking-tight text-[#252525] md:text-8xl lg:text-9xl">
+          <h1 className="mt-6 text-7xl font-black leading-none tracking-tight text-[#E2DFD9] md:text-8xl lg:mt-40 lg:text-9xl">
             V O I D
           </h1>
 
-          <div className="mt-4 h-1.5 w-28 rounded-full bg-gradient-to-r from-[#7B2CFF] via-[#7B2CFF]/70 to-transparent" />
+          <div className="mt-4 h-1.5 w-28 rounded-full bg-gradient-to-r from-[#064DB7] via-[#064DB7]/70 to-transparent" />
 
-          <p className="mt-6 max-w-xl text-xl leading-relaxed text-[#555]">
+          <p className="mt-6 max-w-xl text-xl leading-relaxed text-[#E2DFD9]">
             Earplugs premium diseñados para reducir el ruido sin aislarte.
             Pensados para conciertos, trabajo, estudio, viajes y descanso.
           </p>
@@ -369,48 +252,17 @@ function SafeSoundLanding() {
             <button
               type="button"
               onClick={scrollToPurchaseSection}
-              className="rounded-full bg-[#B7FF00] px-8 py-4 font-black text-black transition hover:scale-105"
+              className="rounded-full bg-[#E2DFD9] px-8 py-4 font-black text-black transition hover:scale-105"
             >
               Elegir acabado
             </button>
             <a
               href="#benefits"
-              className="rounded-full border-2 border-[#7B2CFF] px-8 py-4 font-bold text-[#7B2CFF] transition hover:bg-[#7B2CFF] hover:text-white"
+              className="rounded-full border-2 border-[#E2DFD9] px-8 py-4 font-bold text-[#E2DFD9] transition hover:bg-[#E2DFD9] hover:text-black"
             >
               Ver beneficios
             </a>
           </div>
-
-          <div className="mt-12 grid grid-cols-3 gap-5 rounded-[2rem] border border-[#DDD6D0] bg-white/70 p-6 backdrop-blur">
-            <div className="text-center">
-              <Volume2 className="mx-auto text-[#7B2CFF]" size={30} />
-              <p className="mt-3 font-black">Reduce ruido</p>
-              <span className="text-sm text-[#666]">hasta 23 dB</span>
-            </div>
-            <div className="text-center">
-              <ShieldCheck className="mx-auto text-[#7B2CFF]" size={30} />
-              <p className="mt-3 font-black">Protección</p>
-              <span className="text-sm text-[#666]">uso diario</span>
-            </div>
-            <div className="text-center">
-              <Feather className="mx-auto text-[#7B2CFF]" size={30} />
-              <p className="mt-3 font-black">Ultra cómodos</p>
-              <span className="text-sm text-[#666]">y ligeros</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative flex items-center justify-center">
-          <div className="absolute h-[500px] w-[500px] rounded-full bg-[#B7FF00]/25 blur-[120px]" />
-          <Image
-            src="/images/mute-hero-hd.png"
-            alt="Render premium de los earplugs VOID"
-            width={1254}
-            height={1254}
-            priority
-            sizes="(min-width: 1024px) 44rem, 100vw"
-            className={sectionImageClass}
-          />
         </div>
       </section>
 
@@ -428,7 +280,7 @@ function SafeSoundLanding() {
               style={{ backgroundImage: `url('${backgroundImage}')` }}
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.14)_0%,rgba(8,8,8,0.34)_38%,rgba(8,8,8,0.72)_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(123,44,255,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(6,77,183,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(183,255,0,0.08),transparent_32%)]" />
             <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/12" />
 
             <div className="relative z-10 text-[#B7FF00]">
@@ -448,7 +300,7 @@ function SafeSoundLanding() {
         <div className="grid gap-6 rounded-[2rem] border border-[#DDD6D0] bg-white p-6 md:grid-cols-5">
           {benefitBarItems.map(({ icon: Icon, title, text }) => (
             <div key={title} className="text-center">
-              <Icon className="mx-auto text-[#7B2CFF]" size={34} />
+              <Icon className="mx-auto text-[#064DB7]" size={34} />
               <h3 className="mt-3 font-black">{title}</h3>
               <p className="text-sm text-[#666]">{text}</p>
             </div>
@@ -456,124 +308,7 @@ function SafeSoundLanding() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="relative">
-          <div className="absolute h-[400px] w-[400px] rounded-full bg-[#7B2CFF]/20 blur-[100px]" />
-          <div
-            tabIndex={0}
-            role="region"
-            aria-label="Galería de producto"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onMouseEnter={() => {
-              isHoveringGalleryRef.current = true;
-            }}
-            onMouseLeave={() => {
-              isHoveringGalleryRef.current = false;
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "ArrowLeft") goToPreviousSlide();
-              if (event.key === "ArrowRight") goToNextSlide();
-            }}
-            className="relative overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_18%_18%,#7B2CFF1F,transparent_42%),radial-gradient(circle_at_85%_78%,#B7FF0026,transparent_40%),linear-gradient(160deg,#FFFFFF_0%,#F4F1EF_55%,#ECE7E1_100%)] outline-none"
-          >
-            <div className="relative aspect-square w-full sm:aspect-[4/3] lg:aspect-[2/1]">
-              <div className="absolute left-5 top-5 z-20 rounded-full border border-white/15 bg-[#252525]/78 px-4 py-2 text-xs font-bold uppercase tracking-[0.3em] text-white/85 backdrop-blur">
-                {currentProductSlide.caption}
-              </div>
-
-              <div
-                className={`flex h-full w-full ${isDragging ? "" : "transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"}`}
-                style={{
-                  transform: `translateX(calc(-${activeProductSlide * 100}% + ${
-                    isDragging ? renderDragOffset : 0
-                  }px))`,
-                  willChange: "transform",
-                }}
-              >
-                {productSlides.map((slide) => (
-                  <div
-                    key={`${slide.caption}-${slide.src}`}
-                    className="relative flex h-full w-full shrink-0 basis-full items-center justify-center p-6 sm:p-10 lg:p-14"
-                  >
-                    {slide.kind === "video" ? (
-                      <video
-                        key={slide.src}
-                        src={slide.src}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        className="h-full w-full rounded-xl object-contain shadow-[0_24px_60px_rgba(37,37,37,0.22)]"
-                      />
-                    ) : (
-                      <Image
-                        src={slide.src}
-                        alt={slide.alt}
-                        width={1254}
-                        height={1254}
-                        quality={100}
-                        draggable={false}
-                        sizes="(min-width: 1024px) 60vw, 100vw"
-                        onError={() => handleBrokenImage(slide.src)}
-                        className="h-full w-full object-contain drop-shadow-[0_28px_50px_rgba(37,37,37,0.22)]"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="pointer-events-none absolute inset-0 rounded-[2rem] border border-[#DDD6D0] shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_28px_80px_rgba(37,37,37,0.14)]" />
-
-              <button
-                type="button"
-                aria-label="Imagen anterior"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  goToPreviousSlide();
-                }}
-                onPointerDown={(event) => event.stopPropagation()}
-                className="absolute left-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)] md:h-12 md:w-12"
-              >
-                <ChevronLeft size={20} strokeWidth={2.5} />
-              </button>
-
-              <button
-                type="button"
-                aria-label="Siguiente imagen"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  goToNextSlide();
-                }}
-                onPointerDown={(event) => event.stopPropagation()}
-                className="absolute right-4 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-300 hover:border-[#7B2CFF] hover:bg-[#7B2CFF] hover:shadow-[0_0_20px_rgba(123,44,255,0.4)] md:h-12 md:w-12"
-              >
-                <ChevronRight size={20} strokeWidth={2.5} />
-              </button>
-            </div>
-
-            <div className="mt-5 flex items-center justify-center gap-2">
-              {productSlides.map((slide, index) => {
-                const isActive = index === activeProductSlide;
-                return (
-                  <button
-                    key={`${slide.caption}-dot`}
-                    type="button"
-                    aria-label={`Ver imagen ${index + 1}`}
-                    aria-pressed={isActive}
-                    onClick={() => setActiveProductSlide(index)}
-                    className={`rounded-full transition-all duration-500 ease-out ${
-                      isActive
-                        ? "h-2.5 w-8 bg-[#7B2CFF] shadow-[0_0_12px_rgba(123,44,255,0.4)]"
-                        : "h-2.5 w-2.5 bg-[#252525]/15 hover:bg-[#252525]/30"
-                    }`}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+      <TrustedLogos />
 
       <section
         id="catalogo"
@@ -582,7 +317,7 @@ function SafeSoundLanding() {
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#7B2CFF]">
+            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#064DB7]">
               Catálogo VOID
             </p>
             <h2 className="mt-3 text-5xl font-black text-[#252525]">
@@ -610,33 +345,7 @@ function SafeSoundLanding() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <h2 className="text-center text-5xl font-black">Comentarios reales</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-[#666]">
-          Opiniones auténticas de personas que ya usan SafeSound en su día a día.
-        </p>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {reviews.map(({ age, context, name, quote }) => (
-            <div
-              key={name}
-              className="rounded-[2rem] border border-[#DDD6D0] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-            >
-              <div className="flex gap-1 text-[#B7FF00]">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <Star key={value} size={18} fill="currentColor" />
-                ))}
-              </div>
-              <p className="mt-5 text-lg leading-relaxed text-[#444]">“{quote}”</p>
-              <div className="mt-8 border-t border-[#EEE7E2] pt-5">
-                <p className="font-black text-[#252525]">{name}</p>
-                <p className="mt-1 text-sm text-[#6F6A66]">
-                  {age} años · {context}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <VideoShowcase />
 
       <section
         id="empresas"
@@ -655,7 +364,7 @@ function SafeSoundLanding() {
         </div>
 
         <div>
-          <Building2 className="text-[#7B2CFF]" size={50} />
+          <Building2 className="text-[#064DB7]" size={50} />
           <h2 className="mt-6 text-6xl font-black">Empresas</h2>
           <p className="mt-6 text-lg leading-relaxed text-[#555]">
             SafeSound para empresas está diseñado para oficinas, coworkings,
@@ -702,7 +411,7 @@ function SafeSoundLanding() {
           <button
             type="button"
             onClick={() => setModal({ variant: "healthy" })}
-            className="mt-10 inline-block rounded-full bg-[#7B2CFF] px-8 py-4 font-black text-white transition hover:scale-105"
+            className="mt-10 inline-block rounded-full bg-[#064DB7] px-8 py-4 font-black text-white transition hover:scale-105"
           >
             Saber más
           </button>

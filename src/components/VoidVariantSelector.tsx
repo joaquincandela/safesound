@@ -41,10 +41,10 @@ export default function VoidVariantSelector({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
-        className="flex w-full items-center justify-between gap-4 rounded-[1.35rem] border border-[#DDD6D0] bg-white px-4 py-4 text-left transition hover:border-[#7B2CFF]/35 hover:shadow-sm"
+        className="flex w-full items-center justify-between gap-4 rounded-[1.35rem] border border-[#DDD6D0] bg-white px-4 py-4 text-left transition hover:border-[#064DB7]/35 hover:shadow-sm"
       >
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#7B2CFF]">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#064DB7]">
             Modelo elegido
           </p>
           <div className="mt-2 flex items-center gap-3">
@@ -70,7 +70,7 @@ export default function VoidVariantSelector({
 
         <span
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E8E1DC] text-[#252525] transition ${
-            isOpen ? "rotate-180 border-[#7B2CFF] text-[#7B2CFF]" : ""
+            isOpen ? "rotate-180 border-[#064DB7] text-[#064DB7]" : ""
           }`}
         >
           <ChevronDown size={18} />
@@ -99,8 +99,8 @@ export default function VoidVariantSelector({
                   }}
                   className={`group flex items-center justify-between gap-3 rounded-[1.1rem] border px-3 py-3 text-left transition-all duration-300 ${
                     isSelected
-                      ? "border-[#7B2CFF] bg-[#7B2CFF]/8 ring-1 ring-[#7B2CFF]/15"
-                      : "border-[#E8E1DC] bg-white hover:border-[#7B2CFF]/35 hover:bg-[#FCFAFF]"
+                      ? "border-[#064DB7] bg-[#064DB7]/8 ring-1 ring-[#064DB7]/15"
+                      : "border-[#E8E1DC] bg-white hover:border-[#064DB7]/35 hover:bg-[#FCFAFF]"
                   }`}
                 >
                   <div className="flex min-w-0 items-center gap-3">
@@ -127,8 +127,8 @@ export default function VoidVariantSelector({
                   <span
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition ${
                       isSelected
-                        ? "border-[#7B2CFF] bg-[#7B2CFF] text-white"
-                        : "border-[#DDD6D0] text-transparent group-hover:border-[#7B2CFF]/35"
+                        ? "border-[#064DB7] bg-[#064DB7] text-white"
+                        : "border-[#DDD6D0] text-transparent group-hover:border-[#064DB7]/35"
                     }`}
                   >
                     <Check size={14} />

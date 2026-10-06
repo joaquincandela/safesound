@@ -39,11 +39,11 @@ export default function VoidCatalogGrid({
             key={variant.id}
             className={`overflow-hidden rounded-[1.8rem] border bg-white transition-all duration-300 ${
               isSelected
-                ? "border-[#7B2CFF] shadow-[0_16px_40px_rgba(123,44,255,0.16)] ring-1 ring-[#7B2CFF]/20"
-                : "border-[#DDD6D0] shadow-sm hover:-translate-y-1 hover:border-[#7B2CFF]/25 hover:shadow-xl"
+                ? "border-[#064DB7] shadow-[0_16px_40px_rgba(6,77,183,0.16)] ring-1 ring-[#064DB7]/20"
+                : "border-[#DDD6D0] shadow-sm hover:-translate-y-1 hover:border-[#064DB7]/25 hover:shadow-xl"
             }`}
           >
-            <div className="relative aspect-square overflow-hidden bg-[radial-gradient(circle_at_top,#7B2CFF14,transparent_42%),linear-gradient(180deg,#FCFBFA_0%,#F4F1EF_100%)]">
+            <div className="relative aspect-square overflow-hidden bg-[radial-gradient(circle_at_top,#064DB714,transparent_42%),linear-gradient(180deg,#FCFBFA_0%,#F4F1EF_100%)]">
               <Image
                 src={imageSrc}
                 alt={variant.name}
@@ -52,7 +52,7 @@ export default function VoidCatalogGrid({
                 className="object-cover transition duration-500 hover:scale-[1.03]"
                 onError={() => onBrokenImage(variant.imageSrc)}
               />
-              <div className="absolute left-4 top-4 rounded-full border border-white/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7B2CFF] backdrop-blur">
+              <div className="absolute left-4 top-4 rounded-full border border-white/60 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-[#064DB7] backdrop-blur">
                 {isSelected ? "Seleccionado" : "VOID"}
               </div>
             </div>
@@ -78,7 +78,7 @@ export default function VoidCatalogGrid({
                 <button
                   type="button"
                   onClick={() => onAddToCart(variant)}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#7B2CFF] px-5 py-3 text-sm font-black text-white transition hover:scale-[1.01] hover:shadow-[0_14px_30px_rgba(123,44,255,0.28)]"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#064DB7] px-5 py-3 text-sm font-black text-white transition hover:scale-[1.01] hover:shadow-[0_14px_30px_rgba(6,77,183,0.28)]"
                 >
                   <ShoppingCart size={16} />
                   Agregar al carrito
@@ -90,7 +90,7 @@ export default function VoidCatalogGrid({
                   className={`w-full rounded-full px-5 py-3 text-sm font-black transition ${
                     isSelected
                       ? "bg-[#252525] text-white hover:bg-black"
-                      : "border border-[#7B2CFF]/18 bg-[#7B2CFF]/8 text-[#7B2CFF] hover:bg-[#7B2CFF] hover:text-white"
+                      : "border border-[#064DB7]/18 bg-[#064DB7]/8 text-[#064DB7] hover:bg-[#064DB7] hover:text-white"
                   }`}
                 >
                   {isSelected ? "Seleccionado" : "Seleccionar"}
