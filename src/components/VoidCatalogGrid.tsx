@@ -14,7 +14,6 @@ type Props = {
   variants: VoidVariant[];
   brokenImages: Record<string, boolean>;
   onBrokenImage: (src: string) => void;
-  onSelect: (variant: VoidVariant) => void;
   onAddToCart: (variant: VoidVariant) => void;
 };
 
@@ -23,7 +22,6 @@ export default function VoidCatalogGrid({
   variants,
   brokenImages,
   onBrokenImage,
-  onSelect,
   onAddToCart,
 }: Props) {
   return (
@@ -74,7 +72,7 @@ export default function VoidCatalogGrid({
                 Ref. {variant.reference}
               </p>
 
-              <div className="mt-5 space-y-2.5">
+              <div className="mt-5">
                 <button
                   type="button"
                   onClick={() => onAddToCart(variant)}
@@ -82,18 +80,6 @@ export default function VoidCatalogGrid({
                 >
                   <ShoppingCart size={16} />
                   Agregar al carrito
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onSelect(variant)}
-                  className={`w-full rounded-full px-5 py-3 text-sm font-black transition ${
-                    isSelected
-                      ? "bg-[#252525] text-white hover:bg-black"
-                      : "border border-[#064DB7]/18 bg-[#064DB7]/8 text-[#064DB7] hover:bg-[#064DB7] hover:text-white"
-                  }`}
-                >
-                  {isSelected ? "Seleccionado" : "Seleccionar"}
                 </button>
               </div>
             </div>

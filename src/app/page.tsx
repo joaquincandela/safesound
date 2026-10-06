@@ -77,7 +77,7 @@ export default function SafeSound() {
 }
 
 function SafeSoundLanding() {
-  const { totalQuantity, addItem, openCart } = useCart();
+  const { totalQuantity, addItem, openCart, isOpen: isCartOpen } = useCart();
   const [selectedVariant, setSelectedVariant] = useState<VoidVariant>(voidVariants[0]);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const [modal, setModal] = useState<{
@@ -110,13 +110,6 @@ function SafeSoundLanding() {
     });
   };
 
-  const handleVariantSelect = (variant: VoidVariant, shouldScroll = false) => {
-    persistVariant(variant);
-    if (shouldScroll) {
-      requestAnimationFrame(scrollToPurchaseSection);
-    }
-  };
-
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(null), 2600);
@@ -124,6 +117,7 @@ function SafeSoundLanding() {
   }, [toast]);
 
   const handleAddToCart = (variant: VoidVariant) => {
+    persistVariant(variant);
     addItem(variant);
     setToast({
       id: Date.now(),
@@ -339,7 +333,6 @@ function SafeSoundLanding() {
             variants={voidVariants}
             brokenImages={brokenImages}
             onBrokenImage={handleBrokenImage}
-            onSelect={(variant) => handleVariantSelect(variant, true)}
             onAddToCart={handleAddToCart}
           />
         </div>
@@ -460,6 +453,22 @@ function SafeSoundLanding() {
       </footer>
 
       <CartDrawer whatsappNumber={waNumber} />
+
+      {totalQuantity > 0 && !isCartOpen ? (
+        <button
+          type="button"
+          onClick={openCart}
+          aria-label={`Abrir carrito, ${totalQuantity} ${
+            totalQuantity === 1 ? "unidad" : "unidades"
+          }`}
+          className="fixed bottom-24 right-5 z-[60] flex h-16 w-16 touch-manipulation items-center justify-center rounded-full bg-[#064DB7] text-white shadow-[0_0_35px_rgba(6,77,183,0.65)] transition active:scale-95 hover:scale-110 sm:bottom-[6.5rem] sm:right-6"
+        >
+          <ShoppingCart size={30} />
+          <span className="absolute -right-1 -top-1 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[#B7FF00] px-1.5 text-xs font-black text-black shadow">
+            {totalQuantity}
+          </span>
+        </button>
+      ) : null}
 
       <FaqWidget />
 
