@@ -10,7 +10,7 @@ const slides = [
   { src: "/images/_DSC7076.JPG", width: 7008, height: 3944, alt: "" },
   { src: "/images/DSC01038.JPG", width: 6000, height: 3376, alt: "" },
   { src: "/images/EPICKVOID.JPG", width: 7008, height: 3944, alt: "" },
-  { src: "/images/DSC01117.JPG", width: 6000, height: 3376, alt: "" },
+  { src: "/images/GRIDVOID.JPG", width: 6000, height: 3376, alt: "" },
   { src: "/images/DSC01119.JPG", width: 6000, height: 3376, alt: "" },
   { src: "/images/DSC01434.JPG", width: 6000, height: 3376, alt: "" },
   { src: "/images/PRODUCTOVOID.JPG", width: 6000, height: 3376, alt: "" },
