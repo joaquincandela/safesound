@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { MessageCircle, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { trackPixel } from "../lib/meta-pixel";
 import {
   buildCartOrderWhatsAppMessage,
   formatSoles,
@@ -56,6 +57,15 @@ export default function CartDrawer({ whatsappNumber }: Props) {
 
   const handleCheckout = () => {
     if (lines.length === 0) return;
+    const pixelParams = {
+      content_ids: lines.map((line) => line.variant.reference),
+      content_type: "product",
+      num_items: totalQuantity,
+      value: subtotal,
+      currency: "PEN",
+    };
+    trackPixel("InitiateCheckout", pixelParams);
+    trackPixel("Lead", pixelParams);
     const message = buildCartOrderWhatsAppMessage(lines, subtotal);
     window.open(
       `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,

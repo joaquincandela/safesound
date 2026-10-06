@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { trackPixel } from "../lib/meta-pixel";
 import type { VoidVariant } from "../lib/void-catalog";
 import {
   buildVoidWhatsAppMessage,
@@ -127,6 +128,11 @@ export default function PurchaseModal({
     const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(
       lines.join("\n")
     )}`;
+
+    trackPixel("Lead", {
+      content_name: variant === "compra" ? selectedVoidVariant?.name ?? product : product,
+      content_category: variant,
+    });
 
     window.open(url, "_blank", "noopener,noreferrer");
     onClose();
