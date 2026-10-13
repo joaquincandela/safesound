@@ -58,7 +58,7 @@ export default function CartDrawer({ whatsappNumber }: Props) {
   const handleCheckout = () => {
     if (lines.length === 0) return;
     const pixelParams = {
-      content_ids: lines.map((line) => line.variant.reference),
+      content_ids: lines.map((line) => line.variant.id),
       content_type: "product",
       num_items: totalQuantity,
       value: subtotal,

@@ -122,7 +122,7 @@ function SafeSoundLanding() {
     persistVariant(variant);
     addItem(variant);
     trackPixel("AddToCart", {
-      content_ids: [variant.reference],
+      content_ids: [variant.id],
       content_name: variant.name,
       content_type: "product",
       value: VOID_PRICE_AMOUNT,
