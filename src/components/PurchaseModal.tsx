@@ -238,7 +238,7 @@ export default function PurchaseModal({
               <input
                 id="modelo"
                 type="text"
-                value={`${selectedVoidVariant.name} · ${selectedVoidVariant.reference}`}
+                value={`${selectedVoidVariant.name}`}
                 readOnly
                 className={`${inputBase} cursor-not-allowed bg-[#f5f5f5] text-[#666]`}
               />
