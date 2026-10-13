@@ -74,7 +74,7 @@ export default function HeroBackdrop() {
               fill
               priority={position === 0}
               sizes="100vw"
-              quality={72}
+              quality={85}
               className="object-cover"
             />
           </div>

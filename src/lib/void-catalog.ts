@@ -3,7 +3,6 @@ export type VoidVariant = {
   name: string;
   shortName: string;
   finish: string;
-  reference: string;
   imageSrc: string;
   swatches: [string, string];
 };
@@ -37,8 +36,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID Black Gold",
     shortName: "Black Gold",
     finish: "Negro · Dorado",
-    reference: "SH60612-001",
-    imageSrc: "/images/negrocondorado.png",
+    imageSrc: "/images/DORADONEGRO.jpeg",
     swatches: ["#111111", "#D7B45E"],
   },
   {
@@ -46,8 +44,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID Yellow Gold",
     shortName: "Yellow Gold",
     finish: "Amarillo · Dorado",
-    reference: "SH60612-002",
-    imageSrc: "/images/doradoconamarillo.png",
+    imageSrc: "/images/DORADOAMARILLO.jpeg",
     swatches: ["#F0C93D", "#D7B45E"],
   },
   {
@@ -55,8 +52,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID White Silver",
     shortName: "White Silver",
     finish: "Blanco · Plateado",
-    reference: "SH60612-004",
-    imageSrc: "/images/plateadoconblanco.png",
+    imageSrc: "/images/PLATEADOBLANCO.jpeg",
     swatches: ["#F5F2EE", "#C4C9D4"],
   },
   {
@@ -64,8 +60,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID Black Silver",
     shortName: "Black Silver",
     finish: "Negro · Plateado",
-    reference: "SH60612-005",
-    imageSrc: "/images/plateadoconnegro.png",
+    imageSrc: "/images/PLATEADONEGRO.jpeg",
     swatches: ["#151515", "#B6BCC8"],
   },
   {
@@ -73,8 +68,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID White Purple",
     shortName: "White Purple",
     finish: "Blanco · Morado",
-    reference: "SH60612-008",
-    imageSrc: "/images/moradoconblanco.png",
+    imageSrc: "/images/MORADOBLANCO.jpeg",
     swatches: ["#F5F2EE", "#7B2CFF"],
   },
   {
@@ -82,8 +76,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID White Rose Gold",
     shortName: "White Rose Gold",
     finish: "Blanco · Oro Rosa",
-    reference: "SH60612-012",
-    imageSrc: "/images/rosadoconblanco.png",
+    imageSrc: "/images/OROROSABLANCO.jpeg",
     swatches: ["#F5F2EE", "#D8A39B"],
   },
   {
@@ -91,8 +84,7 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID White Clear",
     shortName: "White Clear",
     finish: "Blanco · Transparente",
-    reference: "SH60612-016",
-    imageSrc: "/images/transparentes.png",
+    imageSrc: "/images/TRANSPARENTEBLANCO.jpeg",
     swatches: ["#F5F2EE", "#DDE5EF"],
   },
   {
@@ -100,9 +92,56 @@ export const voidVariants: VoidVariant[] = [
     name: "VOID Black Clear",
     shortName: "Black Clear",
     finish: "Negro · Transparente",
-    reference: "SH60612-017",
-    imageSrc: "/images/trasnparenteconnegro.png",
+    imageSrc: "/images/TRANSPARENTENEGRO.jpeg",
     swatches: ["#111111", "#DDE5EF"],
+  },
+  {
+    id: "purple-black",
+    name: "VOID Purple Black",
+    shortName: "Purple Black",
+    finish: "Negro · Morado",
+    imageSrc: "/images/MORADONEGRO.jpeg",
+    swatches: ["#111111", "#7B2CFF"],
+  },
+  {
+    id: "rose-gold-black",
+    name: "VOID Rose gold Black",
+    shortName: "Rose gold Black",
+    finish: "Negro · Oro Rosa",
+    imageSrc: "/images/OROROSANEGRO.jpeg",
+    swatches: ["#111111", "#D8A39B"],
+  },
+  {
+    id: "silver-yellow",
+    name: "VOID Silver Yellow",
+    shortName: "Silver Yellow",
+    finish: "Plateado · Amarillo",
+    imageSrc: "/images/PLATEADOAMARILLO.jpeg",
+    swatches: ["#C4C9D4", "#F0C93D"],
+  },
+  {
+    id: "silver-purple",
+    name: "VOID Silver Purple",
+    shortName: "Silver Purple",
+    finish: "Plateado · Morado",
+    imageSrc: "/images/PLATEADOMORADO.jpeg",
+    swatches: ["#C4C9D4", "#7B2CFF"],
+  },
+  {
+    id: "doble-purple",
+    name: "VOID Doble Purple",
+    shortName: "Doble Purple",
+    finish: "Morado · Morado",
+    imageSrc: "/images/MORADOMORADO.jpeg",
+    swatches: ["#7B2CFF", "#7B2CFF"],
+  },
+  {
+    id: "clear-yellow",
+    name: "VOID Clear Yellow",
+    shortName: "Clear Yellow",
+    finish: "Transparente · Amarillo",
+    imageSrc: "/images/TRANSPARENTEAMARILLO.jpeg",
+    swatches: ["#DDE5EF", "#F0C93D"],
   },
 ];
 

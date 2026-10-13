@@ -361,6 +361,7 @@ function SafeSoundLanding() {
             width={1254}
             height={1254}
             sizes="(min-width: 1024px) 40rem, 100vw"
+            quality={90}
             className={sectionImageClass}
           />
         </div>
@@ -427,6 +428,7 @@ function SafeSoundLanding() {
             width={1254}
             height={1254}
             sizes="(min-width: 1024px) 40rem, 100vw"
+            quality={90}
             className={sectionImageClass}
           />
         </div>

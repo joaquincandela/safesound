@@ -45,7 +45,7 @@ const faqs: Faq[] = [
   {
     question: "¿Qué acabados están disponibles?",
     answer:
-      "Hay 8 acabados: Black Gold, Yellow Gold, White Silver, Black Silver, White Purple, White Rose Gold, White Clear y Black Clear.",
+      "Hay 14 acabados: Black Gold, Yellow Gold, White Silver, Black Silver, White Purple, White Rose Gold, White Clear, Black Clear, Purple Black, Rose gold Black, Silver Yellow, Silver Purple, Doble Purple y Clear Yellow.",
   },
   {
     question: "¿Cómo hago mi pedido y el delivery?",

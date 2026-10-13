@@ -46,7 +46,9 @@ export default function VoidCatalogGrid({
                 src={imageSrc}
                 alt={variant.name}
                 fill
-                sizes="(min-width: 1280px) 18rem, (min-width: 640px) 50vw, min(60vw, 19rem)"
+                sizes="(min-width: 1280px) 20rem, (min-width: 640px) 50vw, min(70vw, 22rem)"
+                quality={90}
+                priority={isSelected}
                 className="object-cover transition duration-500 hover:scale-[1.03]"
                 onError={() => onBrokenImage(variant.imageSrc)}
               />
