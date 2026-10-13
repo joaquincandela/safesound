@@ -71,7 +71,6 @@ export default function VoidCatalogGrid({
               </div>
 
               <p className="mt-4 text-xs uppercase tracking-[0.25em] text-[#999]">
-                Ref. {variant.reference}
               </p>
 
               <div className="mt-5">
