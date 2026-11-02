@@ -5,8 +5,16 @@ import { META_PIXEL_ID } from "../lib/meta-pixel";
 import CatalogViewTracker from "../components/CatalogViewTracker";
 
 export const metadata = {
-  title: "SafeSound | Mute the Noise",
-  description: "Premium earplugs designed for concerts, work, travel and sleep. Modern lifestyle protection with style.",
+  metadataBase: new URL("https://safesound.vercel.app"),
+  title: "SafeSound | VOID, earplugs premium en Lima",
+  description:
+    "Earplugs VOID de silicona médica que reducen el ruido sin aislarte. 14 acabados a S/ 65. Pide por WhatsApp.",
+  openGraph: {
+    title: "SafeSound | Mute the noise. Feel the moment.",
+    description: "Earplugs VOID de silicona médica. 14 acabados a S/ 65.",
+    images: ["/assets/foto-roca.jpg"],
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
@@ -14,7 +22,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
-  themeColor: "#F4F1EF",
+  themeColor: "#0C0908",
 };
 
 export default function RootLayout({
@@ -24,6 +32,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="bg-primary-50 text-neutral-50">
         <Script id="meta-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)
