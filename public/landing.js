@@ -254,18 +254,16 @@ window.addEventListener('scroll', pedir, { passive: true });
 window.addEventListener('resize', pedir);
 
 /* ---------- Escucha la diferencia ----------
-   Son dos pistas iguales: la segunda ya viene procesada. Es una simulación, no una medición. */
-function initDemo(urlSin, urlCon) {
+   Una sola pista se procesa en vivo: al activar VOID baja el volumen y se apagan los agudos.
+   Es una simulación, no una medición. */
+function initDemo(cargarAudio) {
   var btn = document.querySelector('#demoPlay');
   if (!btn || btn.getAttribute('data-listo')) return;
   btn.setAttribute('data-listo', '1');
-  var sin = new Audio(urlSin), con = new Audio(urlCon), usaVoid = false, sonando = false;
-  sin.loop = con.loop = true;
-  sin.preload = con.preload = 'none';
   var offB = document.querySelector('#demoOff'), onB = document.querySelector('#demoOn');
+  var aviso = document.querySelector('#demoMsg');
   var barras = Array.prototype.slice.call(document.querySelectorAll('#eq i'));
-  var calma = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function actual() { return usaVoid ? con : sin; }
+  var ctx, ganancia, filtro, analizador, datos, usaVoid = false, sonando = false, listo = false, cargando = false;
   function pintar() {
     btn.classList.toggle('on', sonando);
     btn.setAttribute('aria-label', sonando ? 'Pausar audio' : 'Reproducir audio');
@@ -274,34 +272,65 @@ function initDemo(urlSin, urlCon) {
   }
   function animar() {
     if (!sonando) { barras.forEach(function (b) { b.style.transform = 'scaleY(.08)'; }); return; }
-    if (!calma) {
-      var t = actual().currentTime, golpe = Math.exp(-((t / .46875) % 1) * 5);
-      barras.forEach(function (b, i) {
-        var bajo = i < barras.length * .35 ? 1 : .55;
-        var v = (.28 + .62 * golpe * bajo + .22 * Math.abs(Math.sin(t * 7 + i * 1.7))) * (usaVoid ? .36 : 1);
-        b.style.transform = 'scaleY(' + Math.max(.06, Math.min(1, v)).toFixed(3) + ')';
-      });
-    }
+    analizador.getByteFrequencyData(datos);
+    var suma = 0;
+    barras.forEach(function (b, i) {
+      var v = datos[Math.min(datos.length - 1, 1 + Math.floor(i * .9))] / 255;
+      suma += v;
+      b.style.transform = 'scaleY(' + Math.max(.06, v).toFixed(3) + ')';
+    });
+    window.nivelDemoVoid = suma / barras.length;
     requestAnimationFrame(animar);
   }
+  function aplicar() {
+    if (!ctx) return;
+    ganancia.gain.setTargetAtTime(usaVoid ? .3 : 1, ctx.currentTime, .05);
+    filtro.frequency.setTargetAtTime(usaVoid ? 6500 : 20000, ctx.currentTime, .05);
+  }
+  function fallo() {
+    sonando = false; pintar();
+    aviso.textContent = 'No pudimos reproducir el audio. Revisa que tu dispositivo tenga el sonido activado.';
+  }
+  function crearAudio() {
+    var C = window.AudioContext || window.webkitAudioContext;
+    ctx = new C();
+    ganancia = ctx.createGain(); filtro = ctx.createBiquadFilter(); analizador = ctx.createAnalyser();
+    filtro.type = 'lowpass'; filtro.frequency.value = 20000; analizador.fftSize = 256;
+    datos = new Uint8Array(analizador.frequencyBinCount);
+    ganancia.connect(filtro); filtro.connect(analizador); analizador.connect(ctx.destination);
+    /* En iPhone esto evita que el interruptor de silencio apague el audio de la web. */
+    var mudo = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+    mudo.loop = true;
+    var m = mudo.play(); if (m && m.catch) m.catch(function () {});
+  }
   function tocar() {
-    var r = actual().play();
-    if (r && r.catch) r.catch(function () { sonando = false; pintar(); animar(); });
-    if (!sonando) { sonando = true; pintar(); animar(); }
+    try {
+      if (!ctx) crearAudio();
+      var r = ctx.resume(); if (r && r.catch) r.catch(fallo);
+    } catch (e) { fallo(); return; }
+    aviso.textContent = 'Simulación con audio de muestra, no es una medición. Empieza con volumen medio.';
+    sonando = true; pintar(); aplicar();
+    if (listo || cargando) { animar(); return; }
+    cargando = true;
+    cargarAudio().then(function (bytes) {
+      ctx.decodeAudioData(bytes, function (pista) {
+        var fuente = ctx.createBufferSource();
+        fuente.buffer = pista; fuente.loop = true; fuente.connect(ganancia); fuente.start(0);
+        listo = true; cargando = false;
+        if (!sonando) ctx.suspend();
+      }, fallo);
+    }).catch(fallo);
+    animar();
   }
-  function parar() { sin.pause(); con.pause(); sonando = false; pintar(); animar(); }
-  function elegir(v) {
-    if (v !== usaVoid) {
-      var antes = actual(); usaVoid = v;
-      if (sonando) { actual().currentTime = antes.currentTime; antes.pause(); }
-      pintar();
-    }
-    tocar();
+  function parar() {
+    if (ctx) ctx.suspend();
+    sonando = false; pintar(); animar();
   }
+  function elegir(v) { usaVoid = v; pintar(); aplicar(); if (!sonando) tocar(); }
   btn.onclick = function () { if (sonando) parar(); else tocar(); };
   offB.onclick = function () { elegir(false); };
   onB.onclick = function () { elegir(true); };
-  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.snd')) parar(); });
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.snd') && sonando) parar(); });
   new IntersectionObserver(function (es) { if (!es[0].isIntersecting && sonando) parar(); }, { threshold: .1 }).observe(document.querySelector('#escucha'));
   pintar(); animar();
 }
@@ -310,4 +339,4 @@ pintarCatalogo();
 pintarPedido();
 pintarFaq();
 actualizar();
-initDemo('/assets/demo-concierto.mp4', '/assets/demo-con-void.mp4');
+initDemo(function () { return fetch('/assets/demo-concierto.mp3').then(function (r) { if (!r.ok) throw new Error('audio'); return r.arrayBuffer(); }); });
