@@ -1,6 +1,8 @@
 /* SafeSound VOID: lógica de la landing. Lo que más vas a editar está aquí arriba. */
 var WHATSAPP = '51968255972';
 var PRECIO = 65;
+var PRECIO_ANTES = 80;
+var PRECIO_PACK_2 = 120;
 
 var ACABADOS = [
   ['bs', 'Black Silver', 'Negro y plateado', 'negro'],
@@ -22,6 +24,7 @@ var ACABADOS = [
 var FILTROS = [['todos', 'Todos'], ['negro', 'Base negra'], ['blanco', 'Base blanca'], ['color', 'Color']];
 
 var PREGUNTAS = [
+  ['¿Cuánto cuestan?', 'Un par cuesta S/ 65, antes S/ 80. Si llevas 2 pares pagas S/ 120.'],
   ['¿Son audífonos?', 'No. VOID son earplugs pasivos: no tienen batería ni bluetooth.'],
   ['¿Voy a escuchar la música?', 'Sí. Reducen el ruido sin aislarte, así que sigues escuchando la música y a quien tienes al lado.'],
   ['¿Qué viene en la caja?', 'Tus earplugs VOID, el estuche portátil y 2 pares de tallas de repuesto.'],
@@ -51,24 +54,27 @@ var page = $('.page');
    elegido: la persona ya tocó algo; antes de eso la barra del celular no deja pedir. */
 var sel = 'bs', filtro = 'todos', qty = 1, lineas = [], activo = true, elegido = false;
 
+/* Cada 2 pares, aunque sean de colores distintos, cuestan PRECIO_PACK_2. */
+function precio(n) { return Math.floor(n / 2) * PRECIO_PACK_2 + (n % 2) * PRECIO; }
 function pedido() { return activo ? lineas.concat([{ id: sel, qty: qty }]) : lineas.slice(); }
 function totalPares() { return pedido().reduce(function (t, l) { return t + l.qty; }, 0); }
 function mensaje() {
   var txt = pedido().map(function (l) { return l.qty + ' VOID ' + porId(l.id).name; }).join(', ');
-  return 'Hola, quiero ' + txt + '. Total S/ ' + totalPares() * PRECIO + '.';
+  return 'Hola, quiero ' + txt + '. Total S/ ' + precio(totalPares()) + '.';
 }
 function enlaceWa() { return 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(mensaje()); }
 function datosPixel() {
-  return { value: totalPares() * PRECIO, currency: 'PEN', num_items: totalPares(), content_type: 'product',
+  return { value: precio(totalPares()), currency: 'PEN', num_items: totalPares(), content_type: 'product',
     content_ids: pedido().map(function (l) { return l.id; }) };
 }
 function pixel(ev, datos) { if (window.fbq) fbq('track', ev, datos); }
 
 function pintarPedido() {
-  var a = porId(sel), total = totalPares() * PRECIO, pares = totalPares();
+  var a = porId(sel), total = precio(totalPares()), pares = totalPares();
   $('#selName').textContent = activo ? 'VOID ' + a.name : 'Elige otro color';
   $('#selTone').textContent = activo ? a.tone : 'Toca un acabado para sumarlo';
   $('#selTotal').textContent = total;
+  $('#selWas').textContent = pares > 1 ? pares * PRECIO : PRECIO_ANTES;
   $('#qty').textContent = activo ? qty : '–';
   $('#qInc').disabled = $('#qDec').disabled = $('#addColor').disabled = !activo;
   var img = $('#selImg');
