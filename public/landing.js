@@ -253,7 +253,61 @@ function pedir() { if (!pendiente) { pendiente = true; requestAnimationFrame(act
 window.addEventListener('scroll', pedir, { passive: true });
 window.addEventListener('resize', pedir);
 
+/* ---------- Escucha la diferencia ----------
+   Son dos pistas iguales: la segunda ya viene procesada. Es una simulación, no una medición. */
+function initDemo(urlSin, urlCon) {
+  var btn = document.querySelector('#demoPlay');
+  if (!btn || btn.getAttribute('data-listo')) return;
+  btn.setAttribute('data-listo', '1');
+  var sin = new Audio(urlSin), con = new Audio(urlCon), usaVoid = false, sonando = false;
+  sin.loop = con.loop = true;
+  sin.preload = con.preload = 'none';
+  var offB = document.querySelector('#demoOff'), onB = document.querySelector('#demoOn');
+  var barras = Array.prototype.slice.call(document.querySelectorAll('#eq i'));
+  var calma = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function actual() { return usaVoid ? con : sin; }
+  function pintar() {
+    btn.classList.toggle('on', sonando);
+    btn.setAttribute('aria-label', sonando ? 'Pausar audio' : 'Reproducir audio');
+    offB.className = usaVoid ? '' : 'on'; onB.className = usaVoid ? 'on' : '';
+    offB.setAttribute('aria-pressed', !usaVoid); onB.setAttribute('aria-pressed', usaVoid);
+  }
+  function animar() {
+    if (!sonando) { barras.forEach(function (b) { b.style.transform = 'scaleY(.08)'; }); return; }
+    if (!calma) {
+      var t = actual().currentTime, golpe = Math.exp(-((t / .46875) % 1) * 5);
+      barras.forEach(function (b, i) {
+        var bajo = i < barras.length * .35 ? 1 : .55;
+        var v = (.28 + .62 * golpe * bajo + .22 * Math.abs(Math.sin(t * 7 + i * 1.7))) * (usaVoid ? .36 : 1);
+        b.style.transform = 'scaleY(' + Math.max(.06, Math.min(1, v)).toFixed(3) + ')';
+      });
+    }
+    requestAnimationFrame(animar);
+  }
+  function tocar() {
+    var r = actual().play();
+    if (r && r.catch) r.catch(function () { sonando = false; pintar(); animar(); });
+    if (!sonando) { sonando = true; pintar(); animar(); }
+  }
+  function parar() { sin.pause(); con.pause(); sonando = false; pintar(); animar(); }
+  function elegir(v) {
+    if (v !== usaVoid) {
+      var antes = actual(); usaVoid = v;
+      if (sonando) { actual().currentTime = antes.currentTime; antes.pause(); }
+      pintar();
+    }
+    tocar();
+  }
+  btn.onclick = function () { if (sonando) parar(); else tocar(); };
+  offB.onclick = function () { elegir(false); };
+  onB.onclick = function () { elegir(true); };
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.snd')) parar(); });
+  new IntersectionObserver(function (es) { if (!es[0].isIntersecting && sonando) parar(); }, { threshold: .1 }).observe(document.querySelector('#escucha'));
+  pintar(); animar();
+}
+
 pintarCatalogo();
 pintarPedido();
 pintarFaq();
 actualizar();
+initDemo('/assets/demo-concierto.mp4', '/assets/demo-con-void.mp4');
