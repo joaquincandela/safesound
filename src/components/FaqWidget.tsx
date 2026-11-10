@@ -14,7 +14,7 @@ type Faq = {
   answer: string;
 };
 
-const waNumber = "51968255972";
+const waNumber = "51939843523";
 
 const faqs: Faq[] = [
   {

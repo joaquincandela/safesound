@@ -10,7 +10,7 @@ import {
   VOID_PRODUCT_NAME,
 } from "../lib/void-catalog";
 
-const waNumber = "51968255972";
+const waNumber = "51939843523";
 
 const useOptions = [
   "Dormir",

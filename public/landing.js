@@ -1,5 +1,5 @@
 /* SafeSound VOID: lógica de la landing. Lo que más vas a editar está aquí arriba. */
-var WHATSAPP = '51968255972';
+var WHATSAPP = '51939843523';
 var PRECIO = 65;
 var PRECIO_ANTES = 80;
 var PRECIO_PACK_2 = 120;
