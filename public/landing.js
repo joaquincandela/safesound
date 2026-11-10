@@ -37,7 +37,7 @@ var PREGUNTAS = [
 var VIDEOS = [
   ['reel-gym', 'p-gym', 'En el spinning', 'Chica mostrando el estuche VOID en el gimnasio'],
   ['reel-todo', 'p-todo', 'Del concierto a tu llavero', 'Chica contando cómo usa VOID en conciertos y en su día'],
-  ['reel-fest', 'p-fest', 'En pleno festival', 'Chica usando VOID en un festival']
+  ['moto', 'p-moto', 'En pleno deporte', 'Chica usando VOID en la moto']
 ];
 
 /* ---------- Utilidades ---------- */
