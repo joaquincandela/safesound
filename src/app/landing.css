@@ -48,8 +48,9 @@ a:focus-visible,button:focus-visible{outline:2px solid #064DB7;outline-offset:2p
 
 /* MARQUESINA */
 .mq{overflow:hidden;background:#064DB7;color:#E2DFD9;padding:16px 0}
-.mq-t{display:flex;width:max-content;gap:48px;animation:mq 26s linear infinite;font-size:18px;line-height:28px;font-weight:600;white-space:nowrap}
-.mq-t span{display:flex;gap:48px}
+.mq-t{display:flex;width:max-content;gap:48px;animation:mq 96s linear infinite}
+.mq-t span{display:flex;gap:48px;align-items:center}
+.mq-t img{display:block;height:40px;width:auto;border-radius:10px}
 @keyframes mq{to{transform:translateX(-50%)}}
 
 /* MOMENTOS */

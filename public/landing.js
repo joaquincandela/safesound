@@ -40,6 +40,16 @@ var VIDEOS = [
   ['moto', 'p-moto', 'En pleno deporte', 'Chica usando VOID en la moto']
 ];
 
+/* Logos de la franja de marcas: [archivo, texto alternativo]. */
+var LOGOS = [
+  ['epick.jpg', 'Epick'],
+  ['grid.jpg', 'The Grid'],
+  ['pik.jpg', 'Piknic'],
+  ['piknic-negro.png', 'Piknic'],
+  ['nightpulse.png', 'Nightpulse'],
+  ['wns.jpg', 'WNS']
+];
+
 /* ---------- Utilidades ---------- */
 var $ = function (s) { return document.querySelector(s); };
 var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
@@ -163,6 +173,12 @@ function pintarFaq() {
     c.appendChild(d);
   });
 }
+
+/* ---------- Marcas ---------- */
+/* La franja repite los logos 6 veces para que el bucle infinito no muestre cortes en pantallas anchas. */
+var mqHTML = '';
+for (var rep = 0; rep < 6; rep++) LOGOS.forEach(function (l) { mqHTML += '<img src="/assets/' + l[0] + '" alt="' + l[1] + '">'; });
+$('#mq').innerHTML = '<span>' + mqHTML + '</span><span>' + mqHTML + '</span>';
 
 /* ---------- Videos ---------- */
 var ICON_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M17 10l4 4M21 10l-4 4"></path></svg>';
