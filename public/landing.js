@@ -5,21 +5,22 @@ var PRECIO_ANTES = 80;
 var PRECIO_PACK_2 = 120;
 
 var ACABADOS = [
-  ['bs', 'Black Silver', 'Negro y plateado', 'negro'],
-  ['bg', 'Black Gold', 'Negro y dorado', 'negro'],
-  ['yg', 'Yellow Gold', 'Amarillo y dorado', 'color'],
-  ['ws', 'White Silver', 'Blanco y plateado', 'blanco'],
-  ['wp', 'White Purple', 'Blanco y morado', 'blanco'],
-  ['wr', 'White Rose Gold', 'Blanco y oro rosa', 'blanco'],
-  ['wc', 'White Clear', 'Blanco y transparente', 'blanco'],
-  ['bc', 'Black Clear', 'Negro y transparente', 'negro'],
-  ['pb', 'Purple Black', 'Negro y morado', 'negro'],
-  ['rb', 'Rose Gold Black', 'Negro y oro rosa', 'negro'],
-  ['sy', 'Silver Yellow', 'Plateado y amarillo', 'color'],
-  ['sp', 'Silver Purple', 'Plateado y morado', 'color'],
-  ['dp', 'Doble Purple', 'Morado y morado', 'color'],
-  ['cy', 'Clear Yellow', 'Transparente y amarillo', 'color']
-].map(function (a) { return { id: a[0], name: a[1], tone: a[2], g: a[3] }; });
+  /* id, nombre, descripción, grupo, color silicona, color tapa (mismos que el 3D) */
+  ['bs', 'Black Silver', 'Negro y plateado', 'negro', '#0B0B0B', '#C9CBCE'],
+  ['bg', 'Black Gold', 'Negro y dorado', 'negro', '#0B0B0B', '#C9A24D'],
+  ['yg', 'Yellow Gold', 'Amarillo y dorado', 'color', '#E9C93D', '#C9A24D'],
+  ['ws', 'White Silver', 'Blanco y plateado', 'blanco', '#F2F0EC', '#C9CBCE'],
+  ['wp', 'White Purple', 'Blanco y morado', 'blanco', '#F2F0EC', '#B23FA6'],
+  ['wr', 'White Rose Gold', 'Blanco y oro rosa', 'blanco', '#F2F0EC', '#D29A86'],
+  ['wc', 'White Clear', 'Blanco y transparente', 'blanco', '#F2F0EC', '#E6E3DE'],
+  ['bc', 'Black Clear', 'Negro y transparente', 'negro', '#0B0B0B', '#E6E3DE'],
+  ['pb', 'Purple Black', 'Negro y morado', 'negro', '#9B35A8', '#1A1A1A'],
+  ['rb', 'Rose Gold Black', 'Negro y oro rosa', 'negro', '#D29A86', '#1A1A1A'],
+  ['sy', 'Silver Yellow', 'Plateado y amarillo', 'color', '#C9CBCE', '#E9C93D'],
+  ['sp', 'Silver Purple', 'Plateado y morado', 'color', '#C9CBCE', '#B23FA6'],
+  ['dp', 'Doble Purple', 'Morado y morado', 'color', '#9B35A8', '#B23FA6'],
+  ['cy', 'Clear Yellow', 'Transparente y amarillo', 'color', '#E6E3DE', '#E9C93D']
+].map(function (a) { return { id: a[0], name: a[1], tone: a[2], g: a[3], c1: a[4], c2: a[5] }; });
 
 var FILTROS = [['todos', 'Todos'], ['negro', 'Base negra'], ['blanco', 'Base blanca'], ['color', 'Color']];
 
@@ -88,8 +89,8 @@ function pintarPedido() {
   $('#qty').textContent = activo ? qty : '–';
   $('#qInc').disabled = $('#qDec').disabled = $('#addColor').disabled = !activo;
   var img = $('#selImg');
-  img.src = '/assets/full-' + sel + '.jpg';
-  img.alt = 'VOID ' + a.name;
+  if (img) { img.src = '/assets/full-' + sel + '.jpg'; img.alt = 'VOID ' + a.name; }
+  $$('.st-name').forEach(function (n) { n.textContent = a.name; });
   $$('.wa').forEach(function (l) { l.href = enlaceWa(); });
 
   var txt = $('#buyTxt'), btn = $('#buyBtn'), th = $('#buyTh');
@@ -133,8 +134,11 @@ function pintarCatalogo() {
     var on = activo && a.id === sel;
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'fin' + (on ? ' on' : ''); b.setAttribute('aria-pressed', on);
-    b.innerHTML = '<span class="thumb"><img src="/assets/th-' + a.id + '.jpg" alt="" loading="lazy"></span><span class="fn" style="padding:0 8px">' + a.name + '</span>';
-    b.onclick = function () { sel = a.id; qty = 1; activo = true; elegido = true; pintarCatalogo(); pintarPedido(); };
+    b.innerHTML = '<span class="swd" style="background:linear-gradient(90deg,' + a.c1 + ' 50%,' + a.c2 + ' 50%)"></span><span class="fn">' + a.name + '</span>';
+    b.onclick = function () {
+      sel = a.id; qty = 1; activo = true; elegido = true; pintarCatalogo(); pintarPedido();
+      window.dispatchEvent(new CustomEvent('void:select', { detail: a.id }));
+    };
     grid.appendChild(b);
   });
 }
@@ -211,15 +215,15 @@ if (!reduced) {
 }
 
 /* ---------- Onda de sonido ---------- */
-for (var i = 0; i < 60; i++) {
+var wave = $('#wave');
+for (var i = 0; wave && i < 60; i++) {
   var bar = document.createElement('i');
   bar.style.height = Math.round(22 + 78 * Math.abs(Math.sin(i * .9) * Math.cos(i * .37))) + '%';
   bar.style.animationDelay = (-(i * 37 % 110) / 100) + 's';
-  $('#wave').appendChild(bar);
+  wave.appendChild(bar);
 }
 
 /* ---------- Animación al bajar ---------- */
-var words = $$('.word');
 /* Solo se recalcula si cambia el ancho: en celular la barra del navegador no debe mover la página. */
 var anchoVh = 0;
 function fijarAlto() {
@@ -238,32 +242,21 @@ if (!reduced) {
   $$('.rise').forEach(function (el) { io.observe(el); });
 }
 
-var hero = $('.hero');
-hero.addEventListener('mousemove', function (e) {
-  page.style.setProperty('--mx', ((e.clientX / window.innerWidth - .5) * 2).toFixed(3));
-  page.style.setProperty('--my', ((e.clientY / window.innerHeight - .5) * 2).toFixed(3));
+/* El inicio en 3D (Hero3D) avisa cuando cambia el color. */
+window.addEventListener('void:select3d', function (e) {
+  var id = e.detail;
+  if (!porId(id)) return;
+  sel = id; activo = true; elegido = true; qty = qty || 1;
+  pintarCatalogo(); pintarPedido();
 });
 
-var story = $('.story'), pin = $('.pin'), reels = $('#reels'), frase = $('#frase'), fin = $('#final');
+var reels = $('#reels'), fin = $('#final');
 var pendiente = false;
 function actualizar() {
   pendiente = false;
-  var vh = window.innerHeight, st = page.style;
-  var r = hero.getBoundingClientRect();
-  st.setProperty('--h', clamp(-r.top / r.height).toFixed(4));
-  r = story.getBoundingClientRect();
-  var p = clamp(-r.top / (r.height - pin.offsetHeight));
-  st.setProperty('--p', p.toFixed(4));
-  st.setProperty('--a1', (1 - fade(p, .26, .34)).toFixed(3));
-  st.setProperty('--a2', (fade(p, .32, .4) * (1 - fade(p, .62, .7))).toFixed(3));
-  st.setProperty('--a3', fade(p, .68, .76).toFixed(3));
-  r = reels.getBoundingClientRect();
-  st.setProperty('--rv', clamp((vh - r.top) / (vh + r.height)).toFixed(4));
-  r = fin.getBoundingClientRect();
-  st.setProperty('--f', clamp((vh - r.top) / (vh + r.height)).toFixed(4));
-  r = frase.getBoundingClientRect();
-  var lit = reduced ? 6 : Math.floor(clamp((vh * .8 - r.top) / (vh * .55)) * 6.99);
-  words.forEach(function (w, n) { w.style.opacity = n < lit ? 1 : .3; });
+  var vh = window.innerHeight, st = page.style, r;
+  if (reels) { r = reels.getBoundingClientRect(); st.setProperty('--rv', clamp((vh - r.top) / (vh + r.height)).toFixed(4)); }
+  if (fin) { r = fin.getBoundingClientRect(); st.setProperty('--f', clamp((vh - r.top) / (vh + r.height)).toFixed(4)); }
 }
 function pedir() { if (!pendiente) { pendiente = true; requestAnimationFrame(actualizar); } }
 window.addEventListener('scroll', pedir, { passive: true });
