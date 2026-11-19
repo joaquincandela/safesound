@@ -4,24 +4,23 @@ var PRECIO = 65;
 var PRECIO_ANTES = 80;
 var PRECIO_PACK_2 = 120;
 
+/* Cada acabado lleva sus dos colores para dibujar el círculo selector. */
 var ACABADOS = [
-  ['bs', 'Black Silver', 'Negro y plateado', 'negro'],
-  ['bg', 'Black Gold', 'Negro y dorado', 'negro'],
-  ['yg', 'Yellow Gold', 'Amarillo y dorado', 'color'],
-  ['ws', 'White Silver', 'Blanco y plateado', 'blanco'],
-  ['wp', 'White Purple', 'Blanco y morado', 'blanco'],
-  ['wr', 'White Rose Gold', 'Blanco y oro rosa', 'blanco'],
-  ['wc', 'White Clear', 'Blanco y transparente', 'blanco'],
-  ['bc', 'Black Clear', 'Negro y transparente', 'negro'],
-  ['pb', 'Purple Black', 'Negro y morado', 'negro'],
-  ['rb', 'Rose Gold Black', 'Negro y oro rosa', 'negro'],
-  ['sy', 'Silver Yellow', 'Plateado y amarillo', 'color'],
-  ['sp', 'Silver Purple', 'Plateado y morado', 'color'],
-  ['dp', 'Doble Purple', 'Morado y morado', 'color'],
-  ['cy', 'Clear Yellow', 'Transparente y amarillo', 'color']
-].map(function (a) { return { id: a[0], name: a[1], tone: a[2], g: a[3] }; });
-
-var FILTROS = [['todos', 'Todos'], ['negro', 'Base negra'], ['blanco', 'Base blanca'], ['color', 'Color']];
+  ['bs', 'Black Silver', 'Negro y plateado', '#151515', '#B6BCC8'],
+  ['bg', 'Black Gold', 'Negro y dorado', '#111111', '#D7B45E'],
+  ['yg', 'Yellow Gold', 'Amarillo y dorado', '#F0C93D', '#D7B45E'],
+  ['ws', 'White Silver', 'Blanco y plateado', '#F5F2EE', '#C4C9D4'],
+  ['wp', 'White Purple', 'Blanco y morado', '#F5F2EE', '#7B2CFF'],
+  ['wr', 'White Rose Gold', 'Blanco y oro rosa', '#F5F2EE', '#D8A39B'],
+  ['wc', 'White Clear', 'Blanco y transparente', '#F5F2EE', '#DDE5EF'],
+  ['bc', 'Black Clear', 'Negro y transparente', '#111111', '#DDE5EF'],
+  ['pb', 'Purple Black', 'Negro y morado', '#111111', '#7B2CFF'],
+  ['rb', 'Rose Gold Black', 'Negro y oro rosa', '#111111', '#D8A39B'],
+  ['sy', 'Silver Yellow', 'Plateado y amarillo', '#C4C9D4', '#F0C93D'],
+  ['sp', 'Silver Purple', 'Plateado y morado', '#C4C9D4', '#7B2CFF'],
+  ['dp', 'Doble Purple', 'Morado y morado', '#7B2CFF', '#7B2CFF'],
+  ['cy', 'Clear Yellow', 'Transparente y amarillo', '#DDE5EF', '#F0C93D']
+].map(function (a) { return { id: a[0], name: a[1], tone: a[2], c: [a[3], a[4]] }; });
 
 var PREGUNTAS = [
   ['¿Cuánto cuestan?', 'Un par cuesta S/ 65, antes S/ 80. Si llevas 2 pares pagas S/ 120.'],
@@ -62,7 +61,7 @@ var page = $('.page');
 /* ---------- Pedido ----------
    lineas: colores ya sumados. activo: si el acabado en pantalla cuenta en el pedido.
    elegido: la persona ya tocó algo; antes de eso la barra del celular no deja pedir. */
-var sel = 'bs', filtro = 'todos', qty = 1, lineas = [], activo = true, elegido = false;
+var sel = 'bs', qty = 1, lineas = [], activo = true, elegido = false;
 
 /* Cada 2 pares, aunque sean de colores distintos, cuestan PRECIO_PACK_2. */
 function precio(n) { return Math.floor(n / 2) * PRECIO_PACK_2 + (n % 2) * PRECIO; }
@@ -120,22 +119,17 @@ function pintarPedido() {
 }
 
 function pintarCatalogo() {
-  var chips = $('#chips'); chips.innerHTML = '';
-  FILTROS.forEach(function (f) {
-    var b = document.createElement('button');
-    b.type = 'button'; b.className = 'chip' + (f[0] === filtro ? ' on' : ''); b.textContent = f[1];
-    b.setAttribute('aria-pressed', f[0] === filtro);
-    b.onclick = function () { filtro = f[0]; pintarCatalogo(); };
-    chips.appendChild(b);
-  });
-  var grid = $('#grid'); grid.innerHTML = '';
-  ACABADOS.filter(function (a) { return filtro === 'todos' || a.g === filtro; }).forEach(function (a) {
+  var caja = $('#swatches'); caja.innerHTML = '';
+  ACABADOS.forEach(function (a) {
     var on = activo && a.id === sel;
     var b = document.createElement('button');
-    b.type = 'button'; b.className = 'fin' + (on ? ' on' : ''); b.setAttribute('aria-pressed', on);
-    b.innerHTML = '<span class="thumb"><img src="/assets/th-' + a.id + '.jpg" alt="" loading="lazy"></span><span class="fn" style="padding:0 8px">' + a.name + '</span>';
+    b.type = 'button'; b.className = 'swatch' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', on);
+    b.setAttribute('aria-label', 'VOID ' + a.name + ' — ' + a.tone);
+    b.title = a.name + ' · ' + a.tone;
+    b.innerHTML = '<span class="swatch-c" style="background:linear-gradient(135deg,' + a.c[0] + ' 50%,' + a.c[1] + ' 50%)"></span>';
     b.onclick = function () { sel = a.id; qty = 1; activo = true; elegido = true; pintarCatalogo(); pintarPedido(); };
-    grid.appendChild(b);
+    caja.appendChild(b);
   });
 }
 
